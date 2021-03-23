@@ -1,9 +1,12 @@
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class AndmeteHaldaja {
 
+    // Ühenda andmebaasiga
     private Connection connect() {
         String url = "jdbc:sqlite:" + System.getProperty("user.dir") + "/src/main/resources/andmebaas.db";
         Connection connection = null;
@@ -15,7 +18,7 @@ public class AndmeteHaldaja {
         }
         return connection;
     }
-
+    // Initialiseeri andmebaas
     public AndmeteHaldaja () {
         try (Connection connection = this.connect()) {
             if (connection != null) {
@@ -41,7 +44,7 @@ public class AndmeteHaldaja {
             System.out.println(e.getMessage());
         }
     }
-
+    // Salvest andmebaasi andmeid
     public void salvestaAndmed(String pildiviit, Float kaal, String sugu, int vanus, Float doosiandmed, String idSeade) {
         String sqlCode = "INSERT INTO patsient VALUES(?,?,?,?,?,?,?)";
 
@@ -68,5 +71,27 @@ public class AndmeteHaldaja {
         catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+    }
+    // Küsi andmebaasist kõik andmed
+    public List<Andmed> getKoikPatsiendid() {
+        List<Andmed> koikPatsiendid = new ArrayList<>();
+        try (Connection connection = this.connect()) {
+            String sqlCode = "SELECT pildiviit,kaal,sugu,vanus,doosiandmed from patsient;";
+            Statement sqlStatement = connection.createStatement();
+            ResultSet resultSet = sqlStatement.executeQuery(sqlCode);
+
+            while (resultSet.next()) {
+                Andmed andmeObjekt = new Andmed();
+                andmeObjekt.setViit(resultSet.getString("pildiviit"));
+                andmeObjekt.setKaal(resultSet.getFloat("kaal"));
+                andmeObjekt.setSugu(resultSet.getString("sugu"));
+                andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
+                koikPatsiendid.add(andmeObjekt);
+            }
+        }
+        catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return koikPatsiendid;
     }
 }
