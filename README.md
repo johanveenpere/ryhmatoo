@@ -5,10 +5,10 @@ Klass AndmeHaldaja suhtleb andmebaasiga ning tagastab päringute põhjal väärt
 - Meetod getKoikPatsiendid tagastab Listi mille elemendid on Andmed tüüpi objektid kus iga andmeobjekt on patsient. (võibolla peaks klassi Andmed ümber muutma Patsient)
 
 ## TODO
-[x] - Andmete lisamine
-[x] - Kõigi andmete kättesaamine
-[ ] - Üksikute patsientide pärimine
-[ ] - Sobiva valimi väljasorteerimine
-[ ] - Korrektne veahaldus
-[ ] - Korrektne dokumentatsioon
-[ ] - jar file
+* [x] - Andmete lisamine
+* [x] - Kõigi andmete kättesaamine
+* [ ] - Üksikute patsientide pärimine
+* [ ] - Sobiva valimi väljasorteerimine
+* [ ] - Korrektne veahaldus
+* [ ] - Korrektne dokumentatsioon
+* [ ] - jar file
