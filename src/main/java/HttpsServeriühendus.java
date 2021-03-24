@@ -24,7 +24,7 @@ public class HttpsServeriühendus implements Serveriühendus{
     }
 
     @Override
-    public Andmed SaaMetaAndmed(String pildiviit) {
+    public Andmed SaaMetaandmed(String pildiviit) {
         try{
             HttpURLConnection serveriühendus = (HttpURLConnection) serveriAadress.openConnection();
             serveriühendus.setRequestMethod("GET");
