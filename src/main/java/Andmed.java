@@ -3,7 +3,15 @@ public class Andmed {
     private float kaal;
     private String sugu;
     private int sünniaasta;
-    private float doosiandmed;
+
+    /**
+     * Konstruktorit kutsutakse ainult läbi alamklassi. Isend luuakse viida ja kaalu sisestamisel tehniku poolt.
+     * Ülejäänud isendiväljade täitmine toimub pärast andmete lugemist pildiinfost set-meetodite abil.
+     */
+    protected Andmed(String viit, float kaal) {
+        this.viit = viit;
+        this.kaal = kaal;
+    }
 
     public String getViit() {
         return viit;
@@ -37,11 +45,8 @@ public class Andmed {
         this.sünniaasta = sünniaasta;
     }
 
-    public float getDoosiandmed() {
-        return doosiandmed;
+    public String toString(){
+        return viit + ", " + sünniaasta + ", " + sugu + ", " + kaal;
     }
 
-    public void setDoosiandmed(float doosiandmed) {
-        this.doosiandmed = doosiandmed;
-    }
 }
