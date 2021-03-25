@@ -5,10 +5,17 @@ import java.util.List;
 
 public class TestAndmebaas {
     public static void main(String[] args) {
+        /*
+        Uuring uuring1 = new Uuring("HTYKRG4210311xxx", 23);
+        uuring1.setVanus(18);
+        uuring1.setSugu("M");
+        uuring1.setDoosiandmed(12345);
+         */
         try {
             AndmeteHaldaja haldaja = new AndmeteHaldaja();
-            //haldaja.setParameetrid(10, 80, 5, 60, 85);
-            List<Uuring> uuringud = haldaja.getValim();
+            haldaja.setKriteeriumid(10, 80, 5, 60, 85);
+            //List<Uuring> uuringud = haldaja.getValim();
+            List<Uuring> uuringud = haldaja.loeUuringud();
             for (Uuring uuring : uuringud) {
                 System.out.println(uuring.toString());
             }
@@ -17,7 +24,6 @@ public class TestAndmebaas {
             System.out.println(e.getMessage());
         }
         /*
-        haldaja.salvestaAndmed("HTYKRG4210311xxx",Float.valueOf("23"), "M", 18, Float.valueOf("13"), "AF123");
         List<Andmed> koikPatisendid = haldaja.getKoikPatsiendid();
         for (Andmed patsient : koikPatisendid) {
             System.out.println(patsient.getViit());

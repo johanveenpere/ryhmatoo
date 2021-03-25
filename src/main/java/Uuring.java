@@ -5,6 +5,7 @@ public class Uuring {
     private int vanus;
     private float doosiandmed;
     private int sünniaasta;
+    private String kande_kuupaev;
 
     /**
      * Konstruktorit kutsutakse ainult läbi alamklassi. Isend luuakse viida ja kaalu sisestamisel tehniku poolt.
@@ -53,8 +54,41 @@ public class Uuring {
         this.doosiandmed = doosiandmed;
     }
 
+    public int getSünniaasta() {
+        return sünniaasta;
+    }
+
+    public void setSünniaasta(int sünniaasta) {
+        this.sünniaasta = sünniaasta;
+    }
+
+    public String getKande_kuupaev() {
+        return kande_kuupaev;
+    }
+
+    public void setKande_kuupaev(String kande_kuupaev) {
+        this.kande_kuupaev = kande_kuupaev;
+    }
+
+    public String getSeadme_id() {
+        return seadme_id;
+    }
+
+    public void setSeadme_id(String seadme_id) {
+        this.seadme_id = seadme_id;
+    }
+
+    private String seadme_id;
+
     public String toString(){
-        return this.viit + ", " + this.kaal  + "kg, " + this.sünniaasta + ", " + this.sugu;
+        return this.viit + ", " +
+                this.kaal  + "kg, " +
+                this.sünniaasta + ", " +
+                this.sugu + ", " +
+                this.doosiandmed + ", " +
+                this.vanus + "a, " +
+                this.seadme_id + ", " +
+                this.kande_kuupaev;
     }
 
 }

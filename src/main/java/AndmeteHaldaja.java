@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 public class AndmeteHaldaja {
     private float alampiir;
     private float ulempiir;
-    private float keskKaalKriiteerium;
+    private float keskKaal;
     private float mootemaaramatus;
-    private int minValimSuurus;
+    private int minValim;
 
     public float getAlampiir() {
         return alampiir;
@@ -30,12 +30,12 @@ public class AndmeteHaldaja {
         this.ulempiir = ulempiir;
     }
 
-    public float getKeskKaalKriiteerium() {
-        return keskKaalKriiteerium;
+    public float getKeskKaal() {
+        return keskKaal;
     }
 
-    public void setKeskKaalKriiteerium(float keskKaalKriiteerium) {
-        this.keskKaalKriiteerium = keskKaalKriiteerium;
+    public void setKeskKaal(float keskKaal) {
+        this.keskKaal= keskKaal;
     }
 
     public float getMootemaaramatus() {
@@ -46,12 +46,12 @@ public class AndmeteHaldaja {
         this.mootemaaramatus = mootemaaramatus;
     }
 
-    public int getMinValimSuurus() {
-        return minValimSuurus;
+    public int getMinValim() {
+        return minValim;
     }
 
-    public void setMinValimSuurus(int minValimSuurus) {
-        this.minValimSuurus = minValimSuurus;
+    public void setMinValim(int minValim) {
+        this.minValim = minValim;
     }
 
     public boolean isKriteeriumidSeatud() {
@@ -107,16 +107,16 @@ public class AndmeteHaldaja {
 
     /**
      * Meetod seab kriteeriumid millele valim peab vastama;
-     * @param minValimSuurus int väärtus mis määrab ära miinimum uuringute arvu mida tagastada võib
-     * @param keskKaalKriiteerium float väärtus mis määrab ära mis peab olema valimi keskmine kaal
+     * @param minValim int väärtus mis määrab ära miinimum uuringute arvu mida tagastada võib
+     * @param keskKaal float väärtus mis määrab ära mis peab olema valimi keskmine kaal
      * @param mootemaaramatus float väärtus mis määrab valimi keskmise kaalu hindamisel arvesse võetavat mõõtemääramatust
      * @param alampiir float väärtus mis määrab ära valimis aksepteeritavate uuringute miinimum kaalu
      * @param ulempiir float väärtus mis määrab ära valimis aksepteeritavate uuringute maksimum kaalu
      */
-    public void setParameetrid(int minValimSuurus, float keskKaalKriiteerium, float mootemaaramatus, float alampiir, float ulempiir) {
-        this.keskKaalKriiteerium = keskKaalKriiteerium;
+    public void setKriteeriumid(int minValim, float keskKaal, float mootemaaramatus, float alampiir, float ulempiir) {
+        this.keskKaal = keskKaal;
         this.mootemaaramatus = mootemaaramatus;
-        this.minValimSuurus = minValimSuurus;
+        this.minValim = minValim;
         this.alampiir = alampiir;
         this.ulempiir = ulempiir;
         this.kriteeriumidSeatud = true;
@@ -193,7 +193,7 @@ public class AndmeteHaldaja {
         try (Connection connection = this.connect()) {
             PreparedStatement sqlStatement = connection.prepareStatement(sqlCode);
 
-            sqlStatement.setFloat(1,this.keskKaalKriiteerium);
+            sqlStatement.setFloat(1,this.keskKaal);
             sqlStatement.setFloat(2,this.ulempiir);
             sqlStatement.setFloat(3,this.alampiir);
             ResultSet resultSet = sqlStatement.executeQuery();
@@ -205,7 +205,7 @@ public class AndmeteHaldaja {
                 sorteeritudDataset.add(new Object[]{pildiviit,kaal});
             }
 
-            if (valimSuurus < minValimSuurus) {
+            if (valimSuurus < minValim) {
                 throw new PuudulikValimException("UURINGUTE_MIINIMUM_TÄITMATA_EXCEPTION");
             }
 
@@ -216,9 +216,9 @@ public class AndmeteHaldaja {
                 väljastatavValim.add((String) pildiviitKaal[0]);
                 kaalKokku += (float) pildiviitKaal[1];
                 uuringuidVäljastatamiseks++;
-                float hetkeErinevusKeskmisest = Math.abs(this.keskKaalKriiteerium - kaalKokku / uuringuidVäljastatamiseks);
+                float hetkeErinevusKeskmisest = Math.abs(this.keskKaal- kaalKokku / uuringuidVäljastatamiseks);
                 //System.out.println(hetkeErinevusKeskmisest);
-                if (uuringuidVäljastatamiseks >= this.minValimSuurus &&  hetkeErinevusKeskmisest < mootemaaramatus) {
+                if (uuringuidVäljastatamiseks >= this.minValim &&  hetkeErinevusKeskmisest < mootemaaramatus) {
                     return väljastatavValim;
                 }
             }
