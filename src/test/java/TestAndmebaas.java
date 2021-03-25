@@ -1,11 +1,12 @@
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class TestAndmebaas {
     public static void main(String[] args) {
-        AndmeteHaldaja haldaja = new AndmeteHaldaja(10, 80, 5, 60, 85);
         try {
+            AndmeteHaldaja haldaja = new AndmeteHaldaja(10, 80, 5, 60, 85);
             List<Uuring> uuringud = haldaja.getValim();
             for (Uuring uuring : uuringud) {
                 System.out.println(uuring.toString());

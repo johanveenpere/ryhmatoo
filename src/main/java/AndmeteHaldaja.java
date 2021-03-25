@@ -3,6 +3,10 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Klassi eesmärk on suhelda andmebaasiga. Sisend ja väljund päringud toimuvad kõik Uuring klassi isendite kaudu.
+ * @author Tomi Theodor Kuusik
+ */
 public class AndmeteHaldaja {
     private final float alampiir;
     private final float ulempiir;
@@ -10,7 +14,10 @@ public class AndmeteHaldaja {
     private final float mootemaaramatus;
     private final int minValimSuurus;
 
-    // Ühenda andmebaasiga
+    /**
+     * Meetodi eesmärk on luua ühendus lokaalse sqlite andmebaasiga
+     * @return meetod tagastab Connection klassi isendi.
+     */
     private Connection connect() {
         String url = "jdbc:sqlite:" + System.getProperty("user.dir") + "/src/main/resources/andmebaas.db";
         Connection connection = null;
@@ -22,8 +29,19 @@ public class AndmeteHaldaja {
         return connection;
     }
 
-    // Initialiseeri andmebaas ja default parameetrid
-    public AndmeteHaldaja(int minValimSuurus, float keskKaalKriiteerium, float mootemaaramatus, float alampiir, float ulempiir) {
+    /**
+     * Klassi konstruktor võtab parameetriteks kriteeriumid millele valim peab vastama
+     * Meetod kontrollib andmebaasi olemasolu ning juhul kui andmebaasi ei eksisteeri loob selle
+     * Andmebaasis on üks tabel 'uuring' mis sisaldab 7 attribuuti:
+     * 'pildiviit' (PK), 'kaal', 'sugu', vanus', 'doosiandmed', 'id_seade', 'kande_kuupaev'
+     *
+     * @param minValimSuurus int väärtus mis määrab ära miinimum uuringute arvu mida tagastada võib
+     * @param keskKaalKriiteerium float väärtus mis määrab ära mis peab olema valimi keskmine kaal
+     * @param mootemaaramatus float väärtus mis määrab valimi keskmise kaalu hindamisel arvesse võetavat mõõtemääramatust
+     * @param alampiir float väärtus mis määrab ära valimis aksepteeritavate uuringute miinimum kaalu
+     * @param ulempiir float väärtus mis määrab ära valimis aksepteeritavate uuringute maksimum kaalu
+     */
+    public AndmeteHaldaja(int minValimSuurus, float keskKaalKriiteerium, float mootemaaramatus, float alampiir, float ulempiir) throws SQLException {
         this.keskKaalKriiteerium = keskKaalKriiteerium;
         this.mootemaaramatus = mootemaaramatus;
         this.minValimSuurus = minValimSuurus;
@@ -51,12 +69,16 @@ public class AndmeteHaldaja {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            throw e;
         }
     }
 
-    // Salvest andmebaasi andmeid
-    public void salvestaUuring(Uuring uuring) {
-        String sqlCode = "INSERT INTO patsient VALUES(?,?,?,?,?,?,?)";
+    /**
+     * Meetod salvestab andmebaasi uuringuid.
+     * @param uuring Uuring klassi objekt
+     */
+    public void salvestaUuring(Uuring uuring) throws SQLException {
+        String sqlCode = "INSERT INTO uuring VALUES(?,?,?,?,?,?,?)";
 
         try (Connection connection = this.connect()) {
             PreparedStatement sqlStatement = connection.prepareStatement(sqlCode);
@@ -65,10 +87,10 @@ public class AndmeteHaldaja {
             sqlStatement.setString(3, uuring.getSugu());
             sqlStatement.setInt(4, uuring.getVanus());
             sqlStatement.setFloat(5, uuring.getDoosiandmed());
+            //sqlStatement.setFloat(6, uuring.getIdSeade());
 
-            System.out.print("Kas sobib järgmine kuupäev: ");
             LocalDate date = LocalDate.now();
-            System.out.print(date + " (y/n) - ");
+            System.out.println("Kas sobib järgmine kuupäev: " + date + " (y/n) - ");
             try (Scanner myScanner = new Scanner(System.in)) {
                 if (myScanner.next().equals("y")) {
                     sqlStatement.setString(7, date.toString());
@@ -77,9 +99,15 @@ public class AndmeteHaldaja {
 
             sqlStatement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            throw e;
         }
     }
+
+    /**
+     * Meetod queryib andbebaasist kõik andmed ja väljastab Listi mis koosneb Uuring klassi objektidest
+     * iga objekt on konkreetne uuring andmebaasis.
+     * @return List Uuring objektidest kus iga objekt on kindel uuring
+     */
     public List<Uuring> loeUuringud() {
         List<Uuring> koikUuringud = new ArrayList<>();
         try (Connection connection = this.connect()) {
@@ -99,6 +127,14 @@ public class AndmeteHaldaja {
         }
         return koikUuringud;
     }
+
+    /**
+     * Meetod mis queryib andmebaasist kõik uuringud mis vastavad kriteeriumile ning väljastab kriteeriumitele
+     * vastava valimi. Juhul kui valimit kokku ei tule väljastatakse erind
+     * @return väljastab Listi kõigist uuringu pildiviitadest mis sobivad, et valim kokku tuleks
+     * @throws PuudulikValimException väljastatakse kui valimit ei tule kokku sest uuringud ei vasta kriteeriumitele
+     * @throws SQLException väljastatakse kui tekib probleem andmebaasiga suhtluses
+     */
     private List<String> getValimPildiviidad() throws PuudulikValimException, SQLException {
         ArrayList<Object[]> sorteeritudDataset = new ArrayList<>();
         ArrayList<String> väljastatavValim = new ArrayList<>();
@@ -145,6 +181,14 @@ public class AndmeteHaldaja {
             throw e;
         }
     }
+
+    /**
+     * Meetod väljastab listi Uuring klassi objektidest ning võtab sisendiks Listi mis koosneb pildiviitadest.
+     * Meetodit kasutatakse, et valim seostada uuringutega.
+     * @param pildiviidad List pildiviitadest
+     * @return List mis koosneb Uuring objektidest
+     * @throws SQLException
+     */
     private List<Uuring> getUuringudByPildiviit (List<String> pildiviidad) throws SQLException {
         ArrayList<Uuring> uuringObjektid = new ArrayList<>();
         String pildiviidaList = pildiviidad.stream()
@@ -169,6 +213,13 @@ public class AndmeteHaldaja {
         }
         return uuringObjektid;
     }
+
+    /**
+     * Peameetod valimi saamiseks.
+     * @return Väljastab Listi mis koosneb uuring objektidest
+     * @throws PuudulikValimException
+     * @throws SQLException
+     */
     public List<Uuring> getValim () throws PuudulikValimException, SQLException {
         return getUuringudByPildiviit(getValimPildiviidad());
     }

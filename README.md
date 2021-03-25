@@ -8,7 +8,7 @@ Klass AndmeHaldaja suhtleb andmebaasiga ning tagastab päringute põhjal väärt
 * [x] - Andmete lisamine
 * [x] - Kõigi andmete kättesaamine
 * [ ] - Üksikute patsientide pärimine
-* [ ] - Sobiva valimi väljasorteerimine
-* [ ] - Korrektne veahaldus
-* [ ] - Korrektne dokumentatsioon
+* [x] - Sobiva valimi väljasorteerimine
+* [x] - Korrektne veahaldus
+* [x] - Korrektne dokumentatsioon
 * [ ] - jar file

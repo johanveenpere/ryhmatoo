@@ -5,11 +5,11 @@ import java.util.List;
 
 public class KokkuvõtteKoostaja {
 
-    public void teeCSV(List<Andmed> andmed) throws IOException {
+    public void teeCSV(List<Uuring> uuringud) throws IOException {
         File csvOutputFile = new File("test.csv");
         csvOutputFile.createNewFile();
         try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
-            andmed.forEach(pw::println);
+            uuringud.forEach(pw::println);
         }
     }
 }
