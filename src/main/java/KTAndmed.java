@@ -1,4 +1,4 @@
-public class KTAndmed extends Andmed{
+public class KTAndmed extends Uuring{
     private float compTomoDoseIndex; //Computed Tomography Dose Index
     private float doseLengthProduct; // Dose-length Product
 

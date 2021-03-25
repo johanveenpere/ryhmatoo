@@ -4,11 +4,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AndmeteHaldaja {
-    private float alampiir;
-    private float ülempiir;
-    private float keskKaalKriiteerium = 75;
-    private float mootemääramatus = 2;
-    private int minValimSuurus = 0;
+    private final float alampiir;
+    private final float ulempiir;
+    private final float keskKaalKriiteerium;
+    private final float mootemaaramatus;
+    private final int minValimSuurus;
 
     // Ühenda andmebaasiga
     private Connection connect() {
@@ -23,12 +23,12 @@ public class AndmeteHaldaja {
     }
 
     // Initialiseeri andmebaas ja default parameetrid
-    public AndmeteHaldaja(int minValimSuurus, float keskKaalKriiteerium, float mootemääramatus, float alampiir, float ülempiir) {
+    public AndmeteHaldaja(int minValimSuurus, float keskKaalKriiteerium, float mootemaaramatus, float alampiir, float ulempiir) {
         this.keskKaalKriiteerium = keskKaalKriiteerium;
-        this.mootemääramatus = mootemääramatus;
+        this.mootemaaramatus = mootemaaramatus;
         this.minValimSuurus = minValimSuurus;
         this.alampiir = alampiir;
-        this.ülempiir = ülempiir;
+        this.ulempiir = ulempiir;
 
         try (Connection connection = this.connect()) {
             if (connection != null) {
@@ -55,7 +55,7 @@ public class AndmeteHaldaja {
     }
 
     // Salvest andmebaasi andmeid
-    public void setUuring(Uuring uuring) {
+    public void salvestaUuring(Uuring uuring) {
         String sqlCode = "INSERT INTO patsient VALUES(?,?,?,?,?,?,?)";
 
         try (Connection connection = this.connect()) {
@@ -80,7 +80,7 @@ public class AndmeteHaldaja {
             System.out.println(e.getMessage());
         }
     }
-    public List<Uuring> getUuringud() {
+    public List<Uuring> loeUuringud() {
         List<Uuring> koikUuringud = new ArrayList<>();
         try (Connection connection = this.connect()) {
             String sqlCode = "SELECT pildiviit,kaal,sugu,vanus,doosiandmed from uuring;";
@@ -88,9 +88,7 @@ public class AndmeteHaldaja {
             ResultSet resultSet = sqlStatement.executeQuery(sqlCode);
 
             while (resultSet.next()) {
-                Uuring andmeObjekt = new Uuring();
-                andmeObjekt.setViit(resultSet.getString("pildiviit"));
-                andmeObjekt.setKaal(resultSet.getFloat("kaal"));
+                Uuring andmeObjekt = new Uuring(resultSet.getString("pildiviit"), resultSet.getFloat("kaal"));
                 andmeObjekt.setSugu(resultSet.getString("sugu"));
                 andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
                 andmeObjekt.setVanus(resultSet.getInt("vanus"));
@@ -111,7 +109,7 @@ public class AndmeteHaldaja {
             PreparedStatement sqlStatement = connection.prepareStatement(sqlCode);
 
             sqlStatement.setFloat(1,this.keskKaalKriiteerium);
-            sqlStatement.setFloat(2,this.ülempiir);
+            sqlStatement.setFloat(2,this.ulempiir);
             sqlStatement.setFloat(3,this.alampiir);
             ResultSet resultSet = sqlStatement.executeQuery();
 
@@ -135,7 +133,7 @@ public class AndmeteHaldaja {
                 uuringuidVäljastatamiseks++;
                 float hetkeErinevusKeskmisest = Math.abs(this.keskKaalKriiteerium - kaalKokku / uuringuidVäljastatamiseks);
                 //System.out.println(hetkeErinevusKeskmisest);
-                if (uuringuidVäljastatamiseks >= this.minValimSuurus &&  hetkeErinevusKeskmisest < mootemääramatus) {
+                if (uuringuidVäljastatamiseks >= this.minValimSuurus &&  hetkeErinevusKeskmisest < mootemaaramatus) {
                     return väljastatavValim;
                 }
             }
@@ -159,9 +157,7 @@ public class AndmeteHaldaja {
         ) {
             ResultSet resultSet = statement.executeQuery(sqlQuery);
             while (resultSet.next()) {
-                Uuring andmeObjekt = new Uuring();
-                andmeObjekt.setViit(resultSet.getString("pildiviit"));
-                andmeObjekt.setKaal(resultSet.getFloat("kaal"));
+                Uuring andmeObjekt = new Uuring(resultSet.getString("pildiviit"), resultSet.getFloat("kaal"));
                 andmeObjekt.setSugu(resultSet.getString("sugu"));
                 andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
                 uuringObjektid.add(andmeObjekt);

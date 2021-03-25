@@ -8,7 +8,7 @@ public class TestAndmebaas {
         try {
             List<Uuring> uuringud = haldaja.getValim();
             for (Uuring uuring : uuringud) {
-                uuring.printAndmed();
+                System.out.println(uuring.toString());
             }
         }
         catch (Exception e) {

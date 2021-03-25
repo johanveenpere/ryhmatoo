@@ -1,4 +1,4 @@
-public class RGAndmed extends Andmed{
+public class RGAndmed extends Uuring{
     private float doseAreaProduct;
     private float distanceSourceToPatient;
 
