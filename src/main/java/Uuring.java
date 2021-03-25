@@ -54,7 +54,7 @@ public class Uuring {
     }
 
     public String toString(){
-        return this.viit + ", " + this.sünniaasta + ", " + this.sugu + ", " + this.kaal;
+        return this.viit + ", " + this.kaal  + "kg, " + this.sünniaasta + ", " + this.sugu;
     }
 
 }
