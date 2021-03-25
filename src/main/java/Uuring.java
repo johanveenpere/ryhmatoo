@@ -1,8 +1,8 @@
-public class Andmed {
+public class Uuring {
     private String viit;
     private float kaal;
     private String sugu;
-    private int sünniaasta;
+    private int vanus;
     private float doosiandmed;
 
     public String getViit() {
@@ -29,12 +29,12 @@ public class Andmed {
         this.sugu = sugu;
     }
 
-    public int getSünniaasta() {
-        return sünniaasta;
+    public int getVanus() {
+        return vanus;
     }
 
-    public void setSünniaasta(int sünniaasta) {
-        this.sünniaasta = sünniaasta;
+    public void setVanus(int vanus) {
+        this.vanus = vanus;
     }
 
     public float getDoosiandmed() {
@@ -43,5 +43,12 @@ public class Andmed {
 
     public void setDoosiandmed(float doosiandmed) {
         this.doosiandmed = doosiandmed;
+    }
+    public void printAndmed () {
+        System.out.print(getViit() + ", ");
+        System.out.print(getKaal() + ", ");
+        System.out.print(getVanus() + ", ");
+        System.out.print(getSugu() + ", ");
+        System.out.println(getDoosiandmed() + ", ");
     }
 }

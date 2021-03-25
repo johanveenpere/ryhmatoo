@@ -1,6 +1,7 @@
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AndmeteHaldaja {
     private float alampiir;
@@ -54,17 +55,16 @@ public class AndmeteHaldaja {
     }
 
     // Salvest andmebaasi andmeid
-    public void salvestaAndmed(String pildiviit, Float kaal, String sugu, int vanus, Float doosiandmed, String idSeade) {
+    public void setUuring(Uuring uuring) {
         String sqlCode = "INSERT INTO patsient VALUES(?,?,?,?,?,?,?)";
 
         try (Connection connection = this.connect()) {
             PreparedStatement sqlStatement = connection.prepareStatement(sqlCode);
-            sqlStatement.setString(1, pildiviit);
-            sqlStatement.setFloat(2, kaal);
-            sqlStatement.setString(3, sugu);
-            sqlStatement.setInt(4, vanus);
-            sqlStatement.setFloat(5, doosiandmed);
-            sqlStatement.setString(6, idSeade);
+            sqlStatement.setString(1, uuring.getViit());
+            sqlStatement.setFloat(2, uuring.getKaal());
+            sqlStatement.setString(3, uuring.getSugu());
+            sqlStatement.setInt(4, uuring.getVanus());
+            sqlStatement.setFloat(5, uuring.getDoosiandmed());
 
             System.out.print("Kas sobib järgmine kuupäev: ");
             LocalDate date = LocalDate.now();
@@ -80,20 +80,20 @@ public class AndmeteHaldaja {
             System.out.println(e.getMessage());
         }
     }
-
-    public List<Andmed> getUuringud() {
-        List<Andmed> koikUuringud = new ArrayList<>();
+    public List<Uuring> getUuringud() {
+        List<Uuring> koikUuringud = new ArrayList<>();
         try (Connection connection = this.connect()) {
             String sqlCode = "SELECT pildiviit,kaal,sugu,vanus,doosiandmed from uuring;";
             Statement sqlStatement = connection.createStatement();
             ResultSet resultSet = sqlStatement.executeQuery(sqlCode);
 
             while (resultSet.next()) {
-                Andmed andmeObjekt = new Andmed();
+                Uuring andmeObjekt = new Uuring();
                 andmeObjekt.setViit(resultSet.getString("pildiviit"));
                 andmeObjekt.setKaal(resultSet.getFloat("kaal"));
                 andmeObjekt.setSugu(resultSet.getString("sugu"));
                 andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
+                andmeObjekt.setVanus(resultSet.getInt("vanus"));
                 koikUuringud.add(andmeObjekt);
             }
         } catch (SQLException e) {
@@ -101,7 +101,7 @@ public class AndmeteHaldaja {
         }
         return koikUuringud;
     }
-    public ArrayList<String> getValimPildiviidad() throws PuudulikValimException, SQLException {
+    private List<String> getValimPildiviidad() throws PuudulikValimException, SQLException {
         ArrayList<Object[]> sorteeritudDataset = new ArrayList<>();
         ArrayList<String> väljastatavValim = new ArrayList<>();
         int valimSuurus = 0;
@@ -134,7 +134,7 @@ public class AndmeteHaldaja {
                 kaalKokku += (float) pildiviitKaal[1];
                 uuringuidVäljastatamiseks++;
                 float hetkeErinevusKeskmisest = Math.abs(this.keskKaalKriiteerium - kaalKokku / uuringuidVäljastatamiseks);
-                System.out.println(hetkeErinevusKeskmisest);
+                //System.out.println(hetkeErinevusKeskmisest);
                 if (uuringuidVäljastatamiseks >= this.minValimSuurus &&  hetkeErinevusKeskmisest < mootemääramatus) {
                     return väljastatavValim;
                 }
@@ -146,5 +146,34 @@ public class AndmeteHaldaja {
             System.out.println(e.getMessage());
             throw e;
         }
+    }
+    private List<Uuring> getUuringudByPildiviit (List<String> pildiviidad) throws SQLException {
+        ArrayList<Uuring> uuringObjektid = new ArrayList<>();
+        String pildiviidaList = pildiviidad.stream()
+                .map(s -> String.format("\"%s\"", s))
+                .collect(Collectors.joining(","));
+        String sqlQuery = "SELECT * FROM uuring WHERE pildiviit IN " + "(" + pildiviidaList + ")" ;
+        try (
+                Connection connection = this.connect();
+                Statement statement = connection.createStatement()
+        ) {
+            ResultSet resultSet = statement.executeQuery(sqlQuery);
+            while (resultSet.next()) {
+                Uuring andmeObjekt = new Uuring();
+                andmeObjekt.setViit(resultSet.getString("pildiviit"));
+                andmeObjekt.setKaal(resultSet.getFloat("kaal"));
+                andmeObjekt.setSugu(resultSet.getString("sugu"));
+                andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
+                uuringObjektid.add(andmeObjekt);
+            }
+        }
+        catch (SQLException e) {
+            System.out.println(e.getMessage());
+            throw e;
+        }
+        return uuringObjektid;
+    }
+    public List<Uuring> getValim () throws PuudulikValimException, SQLException {
+        return getUuringudByPildiviit(getValimPildiviidad());
     }
 }
