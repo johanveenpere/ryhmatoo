@@ -8,11 +8,57 @@ import java.util.stream.Collectors;
  * @author Tomi Theodor Kuusik
  */
 public class AndmeteHaldaja {
-    private final float alampiir;
-    private final float ulempiir;
-    private final float keskKaalKriiteerium;
-    private final float mootemaaramatus;
-    private final int minValimSuurus;
+    private float alampiir;
+    private float ulempiir;
+    private float keskKaalKriiteerium;
+    private float mootemaaramatus;
+    private int minValimSuurus;
+
+    public float getAlampiir() {
+        return alampiir;
+    }
+
+    public void setAlampiir(float alampiir) {
+        this.alampiir = alampiir;
+    }
+
+    public float getUlempiir() {
+        return ulempiir;
+    }
+
+    public void setUlempiir(float ulempiir) {
+        this.ulempiir = ulempiir;
+    }
+
+    public float getKeskKaalKriiteerium() {
+        return keskKaalKriiteerium;
+    }
+
+    public void setKeskKaalKriiteerium(float keskKaalKriiteerium) {
+        this.keskKaalKriiteerium = keskKaalKriiteerium;
+    }
+
+    public float getMootemaaramatus() {
+        return mootemaaramatus;
+    }
+
+    public void setMootemaaramatus(float mootemaaramatus) {
+        this.mootemaaramatus = mootemaaramatus;
+    }
+
+    public int getMinValimSuurus() {
+        return minValimSuurus;
+    }
+
+    public void setMinValimSuurus(int minValimSuurus) {
+        this.minValimSuurus = minValimSuurus;
+    }
+
+    public boolean isKriteeriumidSeatud() {
+        return kriteeriumidSeatud;
+    }
+
+    private boolean kriteeriumidSeatud;
 
     /**
      * Meetodi eesmärk on luua ühendus lokaalse sqlite andmebaasiga
@@ -30,29 +76,15 @@ public class AndmeteHaldaja {
     }
 
     /**
-     * Klassi konstruktor võtab parameetriteks kriteeriumid millele valim peab vastama
      * Meetod kontrollib andmebaasi olemasolu ning juhul kui andmebaasi ei eksisteeri loob selle
      * Andmebaasis on üks tabel 'uuring' mis sisaldab 7 attribuuti:
      * 'pildiviit' (PK), 'kaal', 'sugu', vanus', 'doosiandmed', 'id_seade', 'kande_kuupaev'
-     *
-     * @param minValimSuurus int väärtus mis määrab ära miinimum uuringute arvu mida tagastada võib
-     * @param keskKaalKriiteerium float väärtus mis määrab ära mis peab olema valimi keskmine kaal
-     * @param mootemaaramatus float väärtus mis määrab valimi keskmise kaalu hindamisel arvesse võetavat mõõtemääramatust
-     * @param alampiir float väärtus mis määrab ära valimis aksepteeritavate uuringute miinimum kaalu
-     * @param ulempiir float väärtus mis määrab ära valimis aksepteeritavate uuringute maksimum kaalu
      */
-    public AndmeteHaldaja(int minValimSuurus, float keskKaalKriiteerium, float mootemaaramatus, float alampiir, float ulempiir) throws SQLException {
-        this.keskKaalKriiteerium = keskKaalKriiteerium;
-        this.mootemaaramatus = mootemaaramatus;
-        this.minValimSuurus = minValimSuurus;
-        this.alampiir = alampiir;
-        this.ulempiir = ulempiir;
-
+    public AndmeteHaldaja() throws SQLException {
         try (Connection connection = this.connect()) {
             if (connection != null) {
+                System.out.println("ÜHENDATUD ANDMEBAASI");
                 DatabaseMetaData metadata = connection.getMetaData();
-                System.out.println("Andmebaasi driver on " + metadata.getDriverName());
-                System.out.println("Andmebaas edukalt loodud.");
 
                 String sqlCode = "CREATE TABLE IF NOT EXISTS uuring(" +
                         "pildiviit varchar(16) NOT NULL PRIMARY KEY," +
@@ -71,6 +103,23 @@ public class AndmeteHaldaja {
             System.out.println(e.getMessage());
             throw e;
         }
+    }
+
+    /**
+     * Meetod seab kriteeriumid millele valim peab vastama;
+     * @param minValimSuurus int väärtus mis määrab ära miinimum uuringute arvu mida tagastada võib
+     * @param keskKaalKriiteerium float väärtus mis määrab ära mis peab olema valimi keskmine kaal
+     * @param mootemaaramatus float väärtus mis määrab valimi keskmise kaalu hindamisel arvesse võetavat mõõtemääramatust
+     * @param alampiir float väärtus mis määrab ära valimis aksepteeritavate uuringute miinimum kaalu
+     * @param ulempiir float väärtus mis määrab ära valimis aksepteeritavate uuringute maksimum kaalu
+     */
+    public void setParameetrid(int minValimSuurus, float keskKaalKriiteerium, float mootemaaramatus, float alampiir, float ulempiir) {
+        this.keskKaalKriiteerium = keskKaalKriiteerium;
+        this.mootemaaramatus = mootemaaramatus;
+        this.minValimSuurus = minValimSuurus;
+        this.alampiir = alampiir;
+        this.ulempiir = ulempiir;
+        this.kriteeriumidSeatud = true;
     }
 
     /**
@@ -157,7 +206,7 @@ public class AndmeteHaldaja {
             }
 
             if (valimSuurus < minValimSuurus) {
-                throw new PuudulikValimException("Valim ei tule hindamisele. Kaalupiiridesse jäävaid patsiente on vähem kui valimi miinimum");
+                throw new PuudulikValimException("UURINGUTE_MIINIMUM_TÄITMATA_EXCEPTION");
             }
 
             float kaalKokku = 0;
@@ -173,7 +222,12 @@ public class AndmeteHaldaja {
                     return väljastatavValim;
                 }
             }
-            throw new PuudulikValimException("Valim ei tule kokku. Kaalupiiridesse jäävate patsientide kaalukeskmine on mõõteääramatusest väljas");
+            if (kriteeriumidSeatud) {
+                throw new PuudulikValimException("SOBIMATU_KAALUKESKMINE_EXCEPTION");
+            }
+            else {
+                throw new PuudulikValimException("VALIMI_KRITEERIUMID_SEADMATA_EXCEPTION");
+            }
         }
 
         catch (SQLException e) {

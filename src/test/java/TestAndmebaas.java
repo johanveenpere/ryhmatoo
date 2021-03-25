@@ -6,7 +6,8 @@ import java.util.List;
 public class TestAndmebaas {
     public static void main(String[] args) {
         try {
-            AndmeteHaldaja haldaja = new AndmeteHaldaja(10, 80, 5, 60, 85);
+            AndmeteHaldaja haldaja = new AndmeteHaldaja();
+            //haldaja.setParameetrid(10, 80, 5, 60, 85);
             List<Uuring> uuringud = haldaja.getValim();
             for (Uuring uuring : uuringud) {
                 System.out.println(uuring.toString());
