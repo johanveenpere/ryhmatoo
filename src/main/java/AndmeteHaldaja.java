@@ -13,52 +13,41 @@ public class AndmeteHaldaja {
     private float keskKaal;
     private float mootemaaramatus;
     private int minValim;
+    private boolean kriteeriumidSeatud;
 
     public float getAlampiir() {
         return alampiir;
     }
-
     public void setAlampiir(float alampiir) {
         this.alampiir = alampiir;
     }
-
     public float getUlempiir() {
         return ulempiir;
     }
-
     public void setUlempiir(float ulempiir) {
         this.ulempiir = ulempiir;
     }
-
     public float getKeskKaal() {
         return keskKaal;
     }
-
     public void setKeskKaal(float keskKaal) {
         this.keskKaal= keskKaal;
     }
-
     public float getMootemaaramatus() {
         return mootemaaramatus;
     }
-
     public void setMootemaaramatus(float mootemaaramatus) {
         this.mootemaaramatus = mootemaaramatus;
     }
-
     public int getMinValim() {
         return minValim;
     }
-
     public void setMinValim(int minValim) {
         this.minValim = minValim;
     }
-
     public boolean isKriteeriumidSeatud() {
         return kriteeriumidSeatud;
     }
-
-    private boolean kriteeriumidSeatud;
 
     /**
      * Meetodi eesmärk on luua ühendus lokaalse sqlite andmebaasiga
@@ -206,11 +195,15 @@ public class AndmeteHaldaja {
             }
 
             if (valimSuurus < minValim) {
-                throw new PuudulikValimException("UURINGUTE_MIINIMUM_TÄITMATA_EXCEPTION");
+                PuudulikValimException e = new PuudulikValimException(PuudulikValimException.exceptionTypes.UURINGUTE_MIINIMUM_TÄITMATA);
+                e.setUuringuidPuudu(minValim-valimSuurus);
+                throw e;
             }
 
             float kaalKokku = 0;
             int uuringuidVäljastatamiseks = 0;
+            float parimKeskmineKaal = 0;
+            float parimKaaluerinevus = this.ulempiir;
 
             for (Object[] pildiviitKaal : sorteeritudDataset) {
                 väljastatavValim.add((String) pildiviitKaal[0]);
@@ -218,15 +211,24 @@ public class AndmeteHaldaja {
                 uuringuidVäljastatamiseks++;
                 float hetkeErinevusKeskmisest = Math.abs(this.keskKaal- kaalKokku / uuringuidVäljastatamiseks);
                 //System.out.println(hetkeErinevusKeskmisest);
-                if (uuringuidVäljastatamiseks >= this.minValim &&  hetkeErinevusKeskmisest < mootemaaramatus) {
-                    return väljastatavValim;
+                //System.out.println("kaal: " + pildiviitKaal[1] + ", offset: " + hetkeErinevusKeskmisest + ", bestoffset: " + parimKaaluerinevus + ", hetkekeskmine:" + kaalKokku / uuringuidVäljastatamiseks + ", kaalkokku: " + kaalKokku);
+                if (uuringuidVäljastatamiseks >= this.minValim) {
+                    if (hetkeErinevusKeskmisest < parimKaaluerinevus) {
+                        parimKaaluerinevus = hetkeErinevusKeskmisest;
+                        parimKeskmineKaal = kaalKokku / uuringuidVäljastatamiseks;
+                    }
+                    if (hetkeErinevusKeskmisest < mootemaaramatus) {
+                        return väljastatavValim;
+                    }
                 }
             }
             if (kriteeriumidSeatud) {
-                throw new PuudulikValimException("SOBIMATU_KAALUKESKMINE_EXCEPTION");
+                PuudulikValimException e = new PuudulikValimException(PuudulikValimException.exceptionTypes.SOBIMATU_KAALUKESKMINE);
+                e.setHetkeKeskmine(parimKeskmineKaal);
+                throw e;
             }
             else {
-                throw new PuudulikValimException("VALIMI_KRITEERIUMID_SEADMATA_EXCEPTION");
+                throw new PuudulikValimException(PuudulikValimException.exceptionTypes.VALIMI_KRITEERIUMID_SEADMATA);
             }
         }
 
