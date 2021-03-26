@@ -53,14 +53,10 @@ public class AndmeteHaldaja {
      * Meetodi eesmärk on luua ühendus lokaalse sqlite andmebaasiga
      * @return meetod tagastab Connection klassi isendi.
      */
-    private Connection connect() {
+    private Connection connect() throws SQLException {
         String url = "jdbc:sqlite:" + System.getProperty("user.dir") + "/src/main/resources/andmebaas.db";
         Connection connection = null;
-        try {
-            connection = DriverManager.getConnection(url);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        connection = DriverManager.getConnection(url);
         return connection;
     }
 
@@ -88,9 +84,6 @@ public class AndmeteHaldaja {
                     statement.execute(sqlCode);
                 }
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            throw e;
         }
     }
 
@@ -116,7 +109,7 @@ public class AndmeteHaldaja {
      * @param uuring Uuring klassi objekt
      */
     public void salvestaUuring(Uuring uuring) throws SQLException {
-        String sqlCode = "INSERT INTO uuring VALUES(?,?,?,?,?,?,?)";
+        String sqlCode = "INSERT INTO uuring VALUES(?,?,?,?,?,?, CURRENT_TIMESTAMP)";
 
         try (Connection connection = this.connect()) {
             PreparedStatement sqlStatement = connection.prepareStatement(sqlCode);
@@ -125,19 +118,8 @@ public class AndmeteHaldaja {
             sqlStatement.setString(3, uuring.getSugu());
             sqlStatement.setInt(4, uuring.getVanus());
             sqlStatement.setFloat(5, uuring.getDoosiandmed());
-            //sqlStatement.setFloat(6, uuring.getIdSeade());
-
-            LocalDate date = LocalDate.now();
-            System.out.println("Kas sobib järgmine kuupäev: " + date + " (y/n) - ");
-            try (Scanner myScanner = new Scanner(System.in)) {
-                if (myScanner.next().equals("y")) {
-                    sqlStatement.setString(7, date.toString());
-                }
-            }
-
+            sqlStatement.setString(6, uuring.getSeade_id());
             sqlStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw e;
         }
     }
 
@@ -146,7 +128,7 @@ public class AndmeteHaldaja {
      * iga objekt on konkreetne uuring andmebaasis.
      * @return List Uuring objektidest kus iga objekt on kindel uuring
      */
-    public List<Uuring> loeUuringud() {
+    public List<Uuring> loeUuringud() throws SQLException {
         List<Uuring> koikUuringud = new ArrayList<>();
         try (Connection connection = this.connect()) {
             String sqlCode = "SELECT pildiviit,kaal,sugu,vanus,doosiandmed from uuring;";
@@ -158,10 +140,10 @@ public class AndmeteHaldaja {
                 andmeObjekt.setSugu(resultSet.getString("sugu"));
                 andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
                 andmeObjekt.setVanus(resultSet.getInt("vanus"));
+                andmeObjekt.setKande_kuupaev("kande_kuupaev");
+                andmeObjekt.setSeade_id("id_seade");
                 koikUuringud.add(andmeObjekt);
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
         }
         return koikUuringud;
     }
@@ -169,71 +151,78 @@ public class AndmeteHaldaja {
     /**
      * Meetod mis queryib andmebaasist kõik uuringud mis vastavad kriteeriumile ning väljastab kriteeriumitele
      * vastava valimi. Juhul kui valimit kokku ei tule väljastatakse erind
+     *
+     * Valimid järjestatakse keskmisest erineva hälve järgi kasvavas järjekorras ning seejärel itereeritakse
+     * kuni valimi kriteeriumid on täidetud. Võib eksisteerida kombinatsioone kus valim tuleks kokku, kuid
+     * algoritm seda ei leia.
+     *
      * @return väljastab Listi kõigist uuringu pildiviitadest mis sobivad, et valim kokku tuleks
      * @throws PuudulikValimException väljastatakse kui valimit ei tule kokku sest uuringud ei vasta kriteeriumitele
      * @throws SQLException väljastatakse kui tekib probleem andmebaasiga suhtluses
      */
     private List<String> getValimPildiviidad() throws PuudulikValimException, SQLException {
-        ArrayList<Object[]> sorteeritudDataset = new ArrayList<>();
-        ArrayList<String> väljastatavValim = new ArrayList<>();
-        int valimSuurus = 0;
+        // Kontrollin kas kasutaja on valimi määramiseks vajalikud kriteeriumid seadnud
+        if (!this.kriteeriumidSeatud) {
+            throw new PuudulikValimException(PuudulikValimException.exceptionTypes.VALIMI_KRITEERIUMID_SEADMATA);
+        }
 
+        // Valim mis koosneb nende uuringute pildiviidast, kaalust mis vastasid min/max kaalukriteeriumitele
+        ArrayList<Object[]> inValim = new ArrayList<>();
+        // Valim mis koosneb nende uuringute pildiviitadest mis kokku vastavad kesk kaalu kriteeriumile
+        ArrayList<String> outValim = new ArrayList<>();
+        // Counter mis loeb kui suur on sorteerimata valim
+        int unsortedValimSuurus = 0;
+
+        // Meetod queryb andmebaasist need uuringud mis vastavad kaalukriteeriumitele
         String sqlCode = "SELECT pildiviit,kaal, ABS(? - kaal) AS spread from uuring WHERE kaal < ? AND kaal > ? ORDER BY spread;";
         try (Connection connection = this.connect()) {
             PreparedStatement sqlStatement = connection.prepareStatement(sqlCode);
-
             sqlStatement.setFloat(1,this.keskKaal);
             sqlStatement.setFloat(2,this.ulempiir);
             sqlStatement.setFloat(3,this.alampiir);
             ResultSet resultSet = sqlStatement.executeQuery();
 
             while (resultSet.next()) {
-                valimSuurus++;
                 String pildiviit = resultSet.getString("pildiviit");
                 float kaal = resultSet.getFloat("kaal");
-                sorteeritudDataset.add(new Object[]{pildiviit,kaal});
+                inValim.add(new Object[]{pildiviit,kaal});
+                unsortedValimSuurus++;
             }
 
-            if (valimSuurus < minValim) {
+            // Kontrollitakse kas min valimi suurus tuli kokku
+            if (unsortedValimSuurus < minValim) {
                 PuudulikValimException e = new PuudulikValimException(PuudulikValimException.exceptionTypes.UURINGUTE_MIINIMUM_TÄITMATA);
-                e.setUuringuidPuudu(minValim-valimSuurus);
+                e.setUuringuidPuudu(minValim-unsortedValimSuurus);
                 throw e;
             }
 
             float kaalKokku = 0;
-            int uuringuidVäljastatamiseks = 0;
+            int sobivaidUuringuid = 0;
+            // Kui valimi min suurus on täidetud hakkan salvestama infot väikseima hälvega valimi kohta
             float parimKeskmineKaal = 0;
-            float parimKaaluerinevus = this.ulempiir;
+            float parimHalve = this.ulempiir;
 
-            for (Object[] pildiviitKaal : sorteeritudDataset) {
-                väljastatavValim.add((String) pildiviitKaal[0]);
+            // Lisan ükshaaval uuringuid väljastatavasse Listi ning kontrollin kas kriteeriumid on täidetud
+            for (Object[] pildiviitKaal : inValim) {
+                outValim.add((String) pildiviitKaal[0]);
                 kaalKokku += (float) pildiviitKaal[1];
-                uuringuidVäljastatamiseks++;
-                float hetkeErinevusKeskmisest = Math.abs(this.keskKaal- kaalKokku / uuringuidVäljastatamiseks);
-                //System.out.println(hetkeErinevusKeskmisest);
-                //System.out.println("kaal: " + pildiviitKaal[1] + ", offset: " + hetkeErinevusKeskmisest + ", bestoffset: " + parimKaaluerinevus + ", hetkekeskmine:" + kaalKokku / uuringuidVäljastatamiseks + ", kaalkokku: " + kaalKokku);
-                if (uuringuidVäljastatamiseks >= this.minValim) {
-                    if (hetkeErinevusKeskmisest < parimKaaluerinevus) {
-                        parimKaaluerinevus = hetkeErinevusKeskmisest;
-                        parimKeskmineKaal = kaalKokku / uuringuidVäljastatamiseks;
+                sobivaidUuringuid++;
+                float hetkeHalve = Math.abs(this.keskKaal- kaalKokku / sobivaidUuringuid);
+                // Kontrollin kas valimi miinimum on täitunud
+                if (sobivaidUuringuid >= this.minValim) {
+                    if (hetkeHalve < parimHalve) {
+                        parimHalve = hetkeHalve;
+                        parimKeskmineKaal = kaalKokku / sobivaidUuringuid;
                     }
-                    if (hetkeErinevusKeskmisest < mootemaaramatus) {
-                        return väljastatavValim;
+                    if (hetkeHalve < mootemaaramatus) {
+                        return outValim;
                     }
                 }
             }
-            if (kriteeriumidSeatud) {
-                PuudulikValimException e = new PuudulikValimException(PuudulikValimException.exceptionTypes.SOBIMATU_KAALUKESKMINE);
-                e.setHetkeKeskmine(parimKeskmineKaal);
-                throw e;
-            }
-            else {
-                throw new PuudulikValimException(PuudulikValimException.exceptionTypes.VALIMI_KRITEERIUMID_SEADMATA);
-            }
-        }
-
-        catch (SQLException e) {
-            System.out.println(e.getMessage());
+            // Kui valimit ei väljastata siis viskan exceptioni ja panen kaasa parima keskmise kaalu
+            // mis valimi sorteerimise ajal saavutati.
+            PuudulikValimException e = new PuudulikValimException(PuudulikValimException.exceptionTypes.SOBIMATU_KAALUKESKMINE);
+            e.setHetkeKeskmine(parimKeskmineKaal);
             throw e;
         }
     }
@@ -247,10 +236,11 @@ public class AndmeteHaldaja {
      */
     private List<Uuring> getUuringudByPildiviit (List<String> pildiviidad) throws SQLException {
         ArrayList<Uuring> uuringObjektid = new ArrayList<>();
-        String pildiviidaList = pildiviidad.stream()
+        // Teisendan pildiviidad Listist soneks mis on eraldatud komadega ja iga some ümber on jutumärgid
+        String pildiviidadSonena = pildiviidad.stream()
                 .map(s -> String.format("\"%s\"", s))
                 .collect(Collectors.joining(","));
-        String sqlQuery = "SELECT * FROM uuring WHERE pildiviit IN " + "(" + pildiviidaList + ")" ;
+        String sqlQuery = "SELECT * FROM uuring WHERE pildiviit IN " + "(" + pildiviidadSonena + ")" ;
         try (
                 Connection connection = this.connect();
                 Statement statement = connection.createStatement()
@@ -278,5 +268,38 @@ public class AndmeteHaldaja {
      */
     public List<Uuring> getValim () throws PuudulikValimException, SQLException {
         return getUuringudByPildiviit(getValimPildiviidad());
+    }
+
+    /**
+     * Meetodi eesmärk on uuendada andmebaasis olevaid uuringuid
+     * @param uuring Uuring klassi objekt mille pildiviit vastab sellele pildiviidile mis juba andmebaasides on
+     *               ning objekti muutujad on nende väärtustega mida soovitakse muuta.
+     * @throws SQLException Meetodi jooksmise jooksul on võimalik ainult SQLExceptionite tekkimine
+     */
+    public void uuendaUuring(Uuring uuring) throws SQLException{
+        String sqlCode = "UPDATE uuring SET kaal = ?, sugu = ?, vanus = ?, doosiandmed = ?, id_seade = ?, WHERE pildiviit = ?;";
+        try (Connection connection = this.connect()) {
+            PreparedStatement sqlStatement = connection.prepareStatement(sqlCode);
+            sqlStatement.setFloat(1, uuring.getKaal());
+            sqlStatement.setString(2, uuring.getSugu());
+            sqlStatement.setInt(3, uuring.getVanus());
+            sqlStatement.setFloat(4, uuring.getDoosiandmed());
+            sqlStatement.setString(5, uuring.getSeade_id());
+            sqlStatement.setString(6, uuring.getViit());
+            sqlStatement.executeUpdate();
+        }
+    }
+    /**
+     * Meetodi eesmärk on andmebaasist uuringuid eemaldada
+     * @param pildiviit String pildiviit mida soovitakse eemaldada
+     * @throws SQLException
+     */
+    public void eemaldaUuring(String pildiviit) throws SQLException {
+        String sqlCode = "DELETE FROM uuring WHERE pildiviit = ?";
+        try (Connection connection = this.connect()) {
+            PreparedStatement sqlStatement = connection.prepareStatement(sqlCode);
+            sqlStatement.setString(1, pildiviit);
+            sqlStatement.executeUpdate();
+        }
     }
 }

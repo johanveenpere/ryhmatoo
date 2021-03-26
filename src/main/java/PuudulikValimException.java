@@ -1,4 +1,4 @@
-public class PuudulikValimException extends Exception{
+public class PuudulikValimException extends RuntimeException{
     private int uuringuidPuudu;
     private float hetkeKeskmine;
     public enum exceptionTypes {
