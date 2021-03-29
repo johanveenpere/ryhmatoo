@@ -1,8 +1,8 @@
-public class RGAndmed extends Uuring{
+public class RindkereUuring extends Uuring{
     private float doseAreaProduct;
     private float distanceSourceToPatient;
 
-    public RGAndmed(String viit, float kaal) {
+    public RindkereUuring(String viit, float kaal) {
         super(viit, kaal);
     }
 
