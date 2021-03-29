@@ -1,8 +1,8 @@
-public class KTAndmed extends Uuring{
+public class PeaNatiivUuring extends Uuring{
     private float compTomoDoseIndex; //Computed Tomography Dose Index
     private float doseLengthProduct; // Dose-length Product
 
-    public KTAndmed(String viit, float kaal) {
+    public PeaNatiivUuring(String viit, float kaal) {
         super(viit, kaal);
     }
 
