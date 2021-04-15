@@ -1,6 +1,8 @@
-public class Uuring {
+import java.util.Map;
+
+public abstract class Uuring {
     private final String viit;
-    private final float kaal;
+    private final double kaal;
     private String sugu;
     private int vanus;
 
@@ -8,7 +10,7 @@ public class Uuring {
      * Konstruktorit kutsutakse ainult läbi alamklassi. Isend luuakse viida ja kaalu sisestamisel tehniku poolt.
      * Ülejäänud isendiväljade täitmine toimub pärast andmete lugemist pildiinfost set-meetodite abil.
      */
-    protected Uuring(String viit, float kaal) {
+    protected Uuring(String viit, double kaal) {
         this.viit = viit;
         this.kaal = kaal;
     }
@@ -22,7 +24,7 @@ public class Uuring {
         return viit;
     }
 
-    public float getKaal() {
+    public double getKaal() {
         return kaal;
     }
 
@@ -41,6 +43,12 @@ public class Uuring {
     public void setVanus(int vanus) {
         this.vanus = vanus;
     }
+
+    public void setVanus(String vanus) {
+        this.vanus = Integer.parseInt(vanus.substring(0,3));
+    }
+
+    public abstract Map<String, String> getAtribuudid();
 
     public String toString(){
         return this.viit + ", " + this.kaal  + ", " + this.vanus + ", " + this.sugu;
