@@ -1,9 +1,16 @@
+import java.util.Map;
+
 public class PeaNatiivUuring extends Uuring{
     private float compTomoDoseIndex; //Computed Tomography Dose Index
     private float doseLengthProduct; // Dose-length Product
 
     public PeaNatiivUuring(String viit, float kaal) {
         super(viit, kaal);
+    }
+
+    @Override
+    public Map<String, String> getAtribuudid() {
+        return null;
     }
 
     public float getCTDIvol() {
