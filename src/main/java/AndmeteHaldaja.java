@@ -117,8 +117,22 @@ public class AndmeteHaldaja {
             sqlStatement.setFloat(2, uuring.getKaal());
             sqlStatement.setString(3, uuring.getSugu());
             sqlStatement.setInt(4, uuring.getVanus());
+<<<<<<< HEAD
             sqlStatement.setFloat(5, uuring.getDoosiandmed());
             sqlStatement.setString(6, uuring.getSeade_id());
+=======
+            //sqlStatement.setFloat(5, uuring.getDoosiandmed());
+            //sqlStatement.setFloat(6, uuring.getIdSeade());
+
+            LocalDate date = LocalDate.now();
+            System.out.println("Kas sobib järgmine kuupäev: " + date + " (y/n) - ");
+            try (Scanner myScanner = new Scanner(System.in)) {
+                if (myScanner.next().equals("y")) {
+                    sqlStatement.setString(7, date.toString());
+                }
+            }
+
+>>>>>>> master
             sqlStatement.executeUpdate();
         }
     }
@@ -138,7 +152,7 @@ public class AndmeteHaldaja {
             while (resultSet.next()) {
                 Uuring andmeObjekt = new Uuring(resultSet.getString("pildiviit"), resultSet.getFloat("kaal"));
                 andmeObjekt.setSugu(resultSet.getString("sugu"));
-                andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
+                //andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
                 andmeObjekt.setVanus(resultSet.getInt("vanus"));
                 andmeObjekt.setKande_kuupaev("kande_kuupaev");
                 andmeObjekt.setSeade_id("id_seade");
@@ -249,7 +263,7 @@ public class AndmeteHaldaja {
             while (resultSet.next()) {
                 Uuring andmeObjekt = new Uuring(resultSet.getString("pildiviit"), resultSet.getFloat("kaal"));
                 andmeObjekt.setSugu(resultSet.getString("sugu"));
-                andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
+                //andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
                 uuringObjektid.add(andmeObjekt);
             }
         }
