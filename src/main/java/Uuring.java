@@ -54,4 +54,6 @@ public abstract class Uuring {
         return this.viit + ", " + this.kaal  + ", " + this.vanus + ", " + this.sugu;
     }
 
+    public String toStringVäljadeNimed() {return "viit, kaal, vanus, sugu";}
+
 }

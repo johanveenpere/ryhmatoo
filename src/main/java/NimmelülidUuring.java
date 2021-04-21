@@ -72,8 +72,14 @@ public class NimmelülidUuring extends Uuring {
         return atribuudid;
     }
 
+    @Override
     public String toString() {
         return super.toString() + ", " + doseAreaProductAP + ", " + distanceSourceToPatientAP + ", " + doseAreaProductLL + ", " + distanceSourceToPatientLL;
+    }
+
+    @Override
+    public String toStringVäljadeNimed() {
+        return super.toStringVäljadeNimed() + ", DAP_AP, DSP_AP, DAP_LL, DSP_LL";
     }
 
     @Override

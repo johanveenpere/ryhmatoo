@@ -44,8 +44,14 @@ public class RindkereUuring extends Uuring{
         this.distanceSourceToPatient = Double.parseDouble(distanceSourceToPatient);
     }
 
+    @Override
     public String toString(){
         return super.toString() + ", " + doseAreaProduct + ", " + distanceSourceToPatient;
+    }
+
+    @Override
+    public String toStringVäljadeNimed() {
+        return super.toStringVäljadeNimed() + ", DAP, DSP";
     }
 
     @Override

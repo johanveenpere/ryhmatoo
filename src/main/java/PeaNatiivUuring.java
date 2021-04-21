@@ -32,4 +32,9 @@ public class PeaNatiivUuring extends Uuring{
     public String toString(){
         return super.toString() + ", " + compTomoDoseIndex + ", " + doseLengthProduct;
     }
+
+    @Override
+    public String toStringVäljadeNimed() {
+        return super.toStringVäljadeNimed() + ", CTDI, DLP";
+    }
 }
