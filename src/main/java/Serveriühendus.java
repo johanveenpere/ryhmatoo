@@ -1,3 +1,3 @@
 public interface Serveriühendus {
-    public Uuring SaaMetaAndmed(String pildiviit);
+    public String TõmbaUuringud(String pildiviit, String failiTee);
 }
