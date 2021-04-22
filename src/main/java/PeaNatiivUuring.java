@@ -1,10 +1,10 @@
 import java.util.Map;
 
 public class PeaNatiivUuring extends Uuring{
-    private float compTomoDoseIndex; //Computed Tomography Dose Index
-    private float doseLengthProduct; // Dose-length Product
+    private double compTomoDoseIndex; //Computed Tomography Dose Index
+    private double doseLengthProduct; // Dose-length Product
 
-    public PeaNatiivUuring(String viit, float kaal) {
+    public PeaNatiivUuring(String viit, double kaal) {
         super(viit, kaal);
     }
 
@@ -13,19 +13,19 @@ public class PeaNatiivUuring extends Uuring{
         return null;
     }
 
-    public float getCTDIvol() {
+    public double getCTDIvol() {
         return compTomoDoseIndex;
     }
 
-    public float getDLP() {
+    public double getDLP() {
         return doseLengthProduct;
     }
 
-    public void setCTDIvol(float cTDIvol) {
+    public void setCTDIvol(double cTDIvol) {
         this.compTomoDoseIndex = cTDIvol;
     }
 
-    public void setDLP(float dLP) {
+    public void setDLP(double dLP) {
         this.doseLengthProduct = dLP;
     }
 

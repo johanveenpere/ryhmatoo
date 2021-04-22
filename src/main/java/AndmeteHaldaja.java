@@ -83,7 +83,7 @@ public class AndmeteHaldaja {
         try (Connection connection = this.connect()) {
             PreparedStatement sqlStatement = connection.prepareStatement(sqlCode);
             sqlStatement.setString(1, uuring.getViit());
-            sqlStatement.setFloat(2, uuring.getKaal());
+            sqlStatement.setDouble(2, uuring.getKaal());
             sqlStatement.setString(3, uuring.getSugu());
             sqlStatement.setInt(4, uuring.getVanus());
             //sqlStatement.setFloat(5, uuring.getDoosiandmed());
@@ -115,13 +115,13 @@ public class AndmeteHaldaja {
             Statement sqlStatement = connection.createStatement();
             ResultSet resultSet = sqlStatement.executeQuery(sqlCode);
 
-            while (resultSet.next()) {
-                Uuring andmeObjekt = new Uuring(resultSet.getString("pildiviit"), resultSet.getFloat("kaal"));
-                andmeObjekt.setSugu(resultSet.getString("sugu"));
-                //andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
-                andmeObjekt.setVanus(resultSet.getInt("vanus"));
-                koikUuringud.add(andmeObjekt);
-            }
+//            while (resultSet.next()) {
+//                Uuring andmeObjekt = new Uuring(resultSet.getString("pildiviit"), resultSet.getFloat("kaal"));
+//                andmeObjekt.setSugu(resultSet.getString("sugu"));
+//                //andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
+//                andmeObjekt.setVanus(resultSet.getInt("vanus"));
+//                koikUuringud.add(andmeObjekt);
+//            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -200,12 +200,12 @@ public class AndmeteHaldaja {
                 Statement statement = connection.createStatement()
         ) {
             ResultSet resultSet = statement.executeQuery(sqlQuery);
-            while (resultSet.next()) {
-                Uuring andmeObjekt = new Uuring(resultSet.getString("pildiviit"), resultSet.getFloat("kaal"));
-                andmeObjekt.setSugu(resultSet.getString("sugu"));
-                //andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
-                uuringObjektid.add(andmeObjekt);
-            }
+//            while (resultSet.next()) {
+//                Uuring andmeObjekt = new Uuring(resultSet.getString("pildiviit"), resultSet.getFloat("kaal"));
+//                andmeObjekt.setSugu(resultSet.getString("sugu"));
+//                //andmeObjekt.setDoosiandmed(resultSet.getFloat("doosiandmed"));
+//                uuringObjektid.add(andmeObjekt);
+//            }
         }
         catch (SQLException e) {
             System.out.println(e.getMessage());
