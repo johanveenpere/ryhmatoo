@@ -1,8 +1,11 @@
-HttpsServeriühendus.class
 KokkuvõtteKoostaja.class
 Serveriühendus.class
+NimmelülidUuring.class
+KujutiseFailiLugeja.class
+PeaNatiivUuring.class
 PuudulikValimException.class
 Uuring.class
-AndmeteHaldaja.class
-RGAndmed.class
-KTAndmed.class
+OurCGetOperationStoreHandler.class
+CGetUuringud.class
+fileGetter.class
+RindkereUuring.class
