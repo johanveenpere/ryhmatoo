@@ -13,7 +13,7 @@ public class PeaNatiivUuring extends Uuring {
 
     public PeaNatiivUuring() {};
 
-    public PeaNatiivUuring(String viit, float kaal) {
+    public PeaNatiivUuring(String viit, double kaal) {
         super(viit, kaal);
     }
 

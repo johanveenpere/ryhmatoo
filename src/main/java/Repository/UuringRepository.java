@@ -35,7 +35,7 @@ public class UuringRepository {
         return this.em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c", Uuring.class).getResultList();
     }
 
-    public <T extends Uuring> List<Uuring> getValimiKandidaadid(Class<T> uuringType, double minKaal, double maxKaal, double minSuurus) {
+    public <T extends Uuring> List<Uuring> getValimiKandidaadid(Class<T> uuringType, double minKaal, double maxKaal) {
         return this.em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c WHERE c.kaal < " + maxKaal + " AND c.kaal > " + minKaal, Uuring.class).getResultList();
     }
 }

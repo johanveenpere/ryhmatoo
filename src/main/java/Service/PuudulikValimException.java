@@ -1,6 +1,8 @@
+package Service;
+
 public class PuudulikValimException extends RuntimeException{
     private int uuringuidPuudu;
-    private float hetkeKeskmine;
+    private double hetkeKeskmine;
     public enum exceptionTypes {
         VALIMI_KRITEERIUMID_SEADMATA, SOBIMATU_KAALUKESKMINE, UURINGUTE_MIINIMUM_TÄITMATA
     }
@@ -13,10 +15,10 @@ public class PuudulikValimException extends RuntimeException{
     public int getUuringuidPuudu() {
         return uuringuidPuudu;
     }
-    public float getHetkeKeskmine() {
+    public double getHetkeKeskmine() {
         return hetkeKeskmine;
     }
-    public void setHetkeKeskmine(float hetkeKeskmine) {
+    public void setHetkeKeskmine(double hetkeKeskmine) {
         this.hetkeKeskmine = hetkeKeskmine;
     }
 }
