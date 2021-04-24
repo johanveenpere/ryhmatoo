@@ -2,31 +2,31 @@ package Model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
+import java.util.HashMap;
 import java.util.Map;
 
 @Entity
 public class PeaNatiivUuring extends Uuring {
     @Column
-    private float compTomoDoseIndex; //Computed Tomography Dose Index
+    private double compTomoDoseIndex; //Computed Tomography Dose Index
     @Column
-    private float doseLengthProduct; // Dose-length Product
+    private double doseLengthProduct; // Dose-length Product
+    @Transient
+    private String protocolKey;
 
     public PeaNatiivUuring() {};
 
     public PeaNatiivUuring(String viit, double kaal) {
         super(viit, kaal);
+        protocolKey = "Rinnalylid";
     }
 
-    @Override
-    public Map<String, String> getAtribuudid() {
-        return null;
-    }
-
-    public float getCTDIvol() {
+    public double getCTDIvol() {
         return compTomoDoseIndex;
     }
 
-    public float getDLP() {
+    public double getDLP() {
         return doseLengthProduct;
     }
 
@@ -36,6 +36,18 @@ public class PeaNatiivUuring extends Uuring {
 
     public void setDLP(float dLP) {
         this.doseLengthProduct = dLP;
+    }
+
+    public String getProtocolKey() {
+        return protocolKey;
+    }
+
+    public void setProtocolKey(String protocolKey) {
+        this.protocolKey = protocolKey;
+    }
+
+    public Map<String, String> getAtribuudid() {
+        return null;
     }
 
     public String toString(){
