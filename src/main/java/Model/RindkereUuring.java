@@ -1,23 +1,30 @@
+package Model;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import java.util.*;
 
-public class RindkereUuring extends Uuring{
+@Entity
+public class RindkereUuring extends Uuring {
+    @Column
     private double doseAreaProduct;
+    @Column
     private double distanceSourceToPatient;
-    Map<String, String> atribuudid;
+
+    public RindkereUuring(){};
 
     public RindkereUuring(String viit, double kaal) {
         super(viit, kaal);
-        atribuudid = new HashMap<>(Map.of(
+    }
+
+    @Override
+    public Map<String, String> getAtribuudid() {
+        return new HashMap<>(Map.of(
                 "Sugu", "00100040",
                 "Vanus", "00101010",
                 "DoseAreaProduct", "0018115e",
                 "DistanceSourceToPatient", "00181110"
         ));
-    }
-
-    @Override
-    public Map<String, String> getAtribuudid() {
-        return atribuudid;
     }
 
     public double getDoseAreaProduct() {
