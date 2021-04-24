@@ -1,3 +1,5 @@
+import com.pixelmed.dicom.AttributeTag;
+
 import java.util.Map;
 
 public class PeaNatiivUuring extends Uuring{
@@ -9,7 +11,7 @@ public class PeaNatiivUuring extends Uuring{
     }
 
     @Override
-    public Map<String, String> getAtribuudid() {
+    public Map<String, AttributeTag> getEriAtribuudid() {
         return null;
     }
 
