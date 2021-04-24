@@ -1,13 +1,22 @@
+package Model;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import com.pixelmed.dicom.AttributeTag;
 import com.pixelmed.dicom.TagFromName;
 
 import java.time.LocalDate;
 import java.util.*;
 
-public class RindkereUuring extends Uuring{
+@Entity
+public class RindkereUuring extends Uuring {
+    @Column
     private double doseAreaProduct;
+    @Column
     private double distanceSourceToPatient;
     Map<String, AttributeTag> eriAtribuudid;
+
+    public RindkereUuring(){};
 
     public RindkereUuring(String viit, double kaal) {
         super(viit, kaal);

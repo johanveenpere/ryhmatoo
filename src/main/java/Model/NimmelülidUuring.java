@@ -1,3 +1,7 @@
+package Model;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import com.pixelmed.dicom.AttributeTag;
 import com.pixelmed.dicom.TagFromName;
 
@@ -5,10 +9,15 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+@Entity
 public class NimmelülidUuring extends Uuring {
+    @Column
     private double doseAreaProductAP;
+    @Column
     private double doseAreaProductLL;
+    @Column
     private double distanceSourceToPatientAP;
+    @Column
     private double distanceSourceToPatientLL;
     Map<String, AttributeTag> atribuudid;
 
@@ -20,6 +29,8 @@ public class NimmelülidUuring extends Uuring {
                 //, "DistanceSourceToPatient", TagFromName.DistanceSourceToPatient
         ));
     }
+
+    public NimmelülidUuring() {}
 
     public double getDoseAreaProductAP() {
         return doseAreaProductAP;
@@ -54,6 +65,14 @@ public class NimmelülidUuring extends Uuring {
     }
 
     @Override
+    public Map<String, String> getAtribuudid() {
+        return new HashMap<>(Map.of(
+                "Key", "00185101",
+                "Sugu", "00100040",
+                "Vanus", "00101010",
+                "DoseAreaProduct", "0018115e",
+                "DistanceSourceToPatient", "00181110"
+        ));
     public Map<String, AttributeTag> getEriAtribuudid() {
         return atribuudid;
     }
