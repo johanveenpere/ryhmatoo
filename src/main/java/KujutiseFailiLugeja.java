@@ -21,7 +21,7 @@ public class KujutiseFailiLugeja {
      * @param uuring - Uuring isend, kuhu hakatakse väärtuseid lugema.
      * @param failid - List<File> failidega
      * @throws NoSuchMethodException - uuring isendil puudub set-meetod mida väljade täitmisel kutsutakse
-     * @throws InvocationTargetException - kutsutud meetodi visatud erind
+     * @throws InvocationTargetException - kutsutud meetodi visatud ja wrapitud erind
      * @throws IllegalAccessException - kutsutud meetodile pole ligipääsuõigust
      * @throws IOException
      * @throws DicomException - atribuutide nimekirja failist lugemise viga
@@ -50,25 +50,22 @@ public class KujutiseFailiLugeja {
             String atribuudiVäärtuseTüüp = atribuutList.get(atribuut.getValue()).getVRAsString();
             Object atribuudiVäärtus;
             switch (atribuudiVäärtuseTüüp) {
-                case "AS": { // Age String - vanuse edastamiseks kasutatav erivorm kujul "030Y"
+                case "AS" -> { // Age String - vanuse edastamiseks kasutatav erivorm kujul "030Y"
                     klass = int.class;
                     atribuudiVäärtus = Integer.parseInt(atribuutList.get(atribuut.getValue()).getSingleStringValueOrDefault("000Y").substring(0, 3));
-                    break;
                 }
-                case "DS": { // Decimal String
+                case "DS" -> { // Decimal String
                     klass = double.class;
                     atribuudiVäärtus = Double.parseDouble(atribuutList.get(atribuut.getValue()).getSingleStringValueOrDefault("0.0"));
-                    break;
                 }
-                case "DA": { // Date
+                case "DA" -> { // Date
                     klass = LocalDate.class;
                     atribuudiVäärtus = LocalDate.parse(atribuutList.get(atribuut.getValue()).getSingleStringValueOrDefault("19000101"), DateTimeFormatter.BASIC_ISO_DATE);
-                    break;
                 }
-                default:
+                default -> {
                     klass = String.class;
                     atribuudiVäärtus = atribuutList.get(atribuut.getValue()).getSingleStringValueOrEmptyString();
-                    break;
+                }
             }
             Method kutsutavMeetod = uuring.getClass().getMethod("set" + atribuut.getKey() + key, klass);
             kutsutavMeetod.invoke(uuring, atribuudiVäärtus);
