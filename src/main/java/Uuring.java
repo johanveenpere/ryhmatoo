@@ -1,3 +1,8 @@
+import com.pixelmed.dicom.AttributeTag;
+import com.pixelmed.dicom.TagFromName;
+
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Uuring {
@@ -5,6 +10,9 @@ public abstract class Uuring {
     private final double kaal;
     private String sugu;
     private int vanus;
+    private String seade;
+    private LocalDate kuupäev;
+    private Map<String, AttributeTag> põhiAtribuudid;
 
     /**
      * Konstruktorit kutsutakse ainult läbi alamklassi. Isend luuakse viida ja kaalu sisestamisel tehniku poolt.
@@ -13,6 +21,12 @@ public abstract class Uuring {
     protected Uuring(String viit, double kaal) {
         this.viit = viit;
         this.kaal = kaal;
+        põhiAtribuudid = new HashMap<>(Map.of(
+                "Sugu", TagFromName.PatientSex,
+                "Vanus", TagFromName.PatientAge,
+                "Seade", TagFromName.StationName,
+                "Kuupäev",TagFromName.AcquisitionDate
+        ));
     }
 
     /**
@@ -44,14 +58,30 @@ public abstract class Uuring {
         this.vanus = vanus;
     }
 
-    public void setVanus(String vanus) {
-        this.vanus = Integer.parseInt(vanus.substring(0,3));
+    public void setSeade(String seade) {
+        this.seade = seade;
     }
 
-    public abstract Map<String, String> getAtribuudid();
+    public void setKuupäev(LocalDate kuupäev) {
+        this.kuupäev = kuupäev;
+    }
+
+    public String getSeade() {
+        return seade;
+    }
+
+    public LocalDate getKuupäev() {
+        return kuupäev;
+    }
+
+    public Map<String, AttributeTag> getPõhiAtribuudid() {
+        return põhiAtribuudid;
+    }
+
+    public abstract Map<String, AttributeTag> getEriAtribuudid();
 
     public String toString(){
-        return this.viit + ", " + this.kaal  + ", " + this.vanus + ", " + this.sugu;
+        return this.kuupäev + ", " +this.seade + ", " + this.viit + ", " + this.kaal  + ", " + this.vanus + ", " + this.sugu;
     }
 
 }
