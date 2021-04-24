@@ -1,5 +1,7 @@
 package Model;
 
+import com.pixelmed.dicom.AttributeTag;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
@@ -20,6 +22,11 @@ public class PeaNatiivUuring extends Uuring {
     public PeaNatiivUuring(String viit, double kaal) {
         super(viit, kaal);
         protocolKey = "Rinnalylid";
+    }
+
+    @Override
+    public Map<String, AttributeTag> getEriAtribuudid() {
+        return null;
     }
 
     public double getCTDIvol() {

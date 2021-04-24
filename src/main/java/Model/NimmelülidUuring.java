@@ -2,6 +2,10 @@ package Model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import com.pixelmed.dicom.AttributeTag;
+import com.pixelmed.dicom.TagFromName;
+
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,30 +58,11 @@ public class NimmelülidUuring extends Uuring {
         this.distanceSourceToPatientLL = distanceSourceToPatientLL;
     }
 
-    public void setDoseAreaProductAP(String doseAreaProductAP) {
-        this.doseAreaProductAP = Double.parseDouble(doseAreaProductAP);
-    }
-
-    public void setDistanceSourceToPatientAP(String distanceSourceToPatientAP) {
-        this.distanceSourceToPatientAP = Double.parseDouble(distanceSourceToPatientAP);
-    }
-
-    public void setDoseAreaProductLL(String doseAreaProductLL) {
-        this.doseAreaProductLL = Double.parseDouble(doseAreaProductLL);
-    }
-
-    public void setDistanceSourceToPatientLL(String distanceSourceToPatientLL) {
-        this.distanceSourceToPatientLL = Double.parseDouble(distanceSourceToPatientLL);
-    }
-
-    @Override
-    public Map<String, String> getAtribuudid() {
+    public Map<String, AttributeTag> getEriAtribuudid() {
         return new HashMap<>(Map.of(
-                "Key", "00185101",
-                "Sugu", "00100040",
-                "Vanus", "00101010",
-                "DoseAreaProduct", "0018115e",
-                "DistanceSourceToPatient", "00181110"
+                "Key", TagFromName.ViewPosition,
+                "DoseAreaProduct", new AttributeTag(0x0018,0x115E)
+                //, "DistanceSourceToPatient", TagFromName.DistanceSourceToPatient
         ));
     }
 
@@ -85,13 +70,4 @@ public class NimmelülidUuring extends Uuring {
         return super.toString() + ", " + doseAreaProductAP + ", " + distanceSourceToPatientAP + ", " + doseAreaProductLL + ", " + distanceSourceToPatientLL;
     }
 
-    @Override
-    public void setVanus(String vanus) {
-        super.setVanus(vanus);
-    }
-
-    @Override
-    public void setSugu(String sugu) {
-        super.setSugu(sugu);
-    }
 }
