@@ -5,111 +5,73 @@ import Repository.UuringRepository;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static Service.PuudulikValimException.exceptionTypes.SOBIMATU_KAALUKESKMINE;
 import static Service.PuudulikValimException.exceptionTypes.UURINGUTE_MIINIMUM_TÄITMATA;
 
+/**
+ * Klass suudab tagastada valimi mis vastab kriteeriumitele
+ * @param <T> uuringu klassi tüüp millest soovitakse valik teha
+ */
 public class ValimiSelekteerija <T extends Uuring> {
-    private Class<T> uuringType;
-    private EntityManagerFactory emf;
-    private double maxKaal;
-    private double minKaal;
-    private double keskKaal;
-    private double mootemaaramatus;
-    private int minValim;
-    // indeksid: 1 = keskmine, 2 = hälve
-    private double[] bestValimiKandidaat = new double[2];
+    private final Class<T> uuringType;
+    private final EntityManagerFactory emf;
+    private final Kriteerium kriteerium;
 
-    public ValimiSelekteerija(EntityManagerFactory emf, Class<T> uuringType, double maxKaal, double minKaal, double keskKaal, int minValim, double mootemaaramatus) {
-        this.emf = emf;
+    /**
+     * Konstruktoris on vaja määrata järgmised parameetrid:
+     * @param uuringType Uuring klass mille kohta soovitakse valim sorteerida
+     * @param emf EMF
+     * @param kriteerium kriteeriumi objekt mille järgi valimit sorteeritakse
+     */
+    public ValimiSelekteerija(Class<T> uuringType, EntityManagerFactory emf, Kriteerium kriteerium) {
         this.uuringType = uuringType;
-        this.maxKaal = maxKaal;
-        this.minKaal = minKaal;
-        this.keskKaal = keskKaal;
-        this.minValim = minValim;
-        this.mootemaaramatus = mootemaaramatus;
+        this.emf = emf;
+        this.kriteerium = kriteerium;
     }
-    public List<Uuring> getValim() throws PuudulikValimException {
+
+    public Valim getValim() throws PuudulikValimException {
         EntityManager em = emf.createEntityManager();
         try {
             UuringRepository repo = new UuringRepository(this.emf,em);
-            List<Uuring> valim = repo.getValimiKandidaadid(uuringType,minKaal,maxKaal);
-            Collections.sort(valim);
-            /*
-            int index = 1;
-            for (Uuring uuring : valim) {
-                System.out.println(index + ". " + uuring.toString());
-                ++index;
+            Valim sorteerimataValim = new Valim(kriteerium, uuringType, repo.getValimiKandidaadid(uuringType, kriteerium));
+            if (!sorteerimataValim.isMiinimumTäidetud()) {
+                throw new PuudulikValimException(UURINGUTE_MIINIMUM_TÄITMATA, sorteerimataValim);
             }
-            System.out.println("=".repeat(20));
-            */
-            if (valim.size() < minValim) {
-                PuudulikValimException e = new PuudulikValimException(UURINGUTE_MIINIMUM_TÄITMATA);
-                double sum = valim.stream().mapToDouble(Uuring::getKaal).sum();
-                e.setUuringuidPuudu(minValim - valim.size());
-                e.setHetkeKeskmine((float) (sum/valim.size()));
-                throw e;
-            }
-            Uuring[] leitudValim = findValim(valim.toArray(new Uuring[valim.size()]), new Uuring[0]);
-            if (leitudValim == null) {
-                PuudulikValimException e = new PuudulikValimException(SOBIMATU_KAALUKESKMINE);
-                e.setHetkeKeskmine(this.bestValimiKandidaat[0]);
-                throw e;
+            Valim sorteeritudValim = findValim(sorteerimataValim.getUuringud().toArray(new Uuring[sorteerimataValim.getSuurus()]), new Uuring[0]);
+            if (!sorteeritudValim.isVastabKriteeriumitele()) {
+                throw new PuudulikValimException(SOBIMATU_KAALUKESKMINE, sorteeritudValim);
             }
             else {
-                return Arrays.asList(leitudValim);
+                return sorteeritudValim;
             }
         }
         finally {
             em.close();
         }
     }
-    private Uuring[] findValim(Uuring[] searchPool, Uuring[] resultPool) {
-        // Kui otsitav valim ongi miinimumsuurusega
-        if (searchPool.length + resultPool.length == minValim) {
+    private Valim findValim(Uuring[] searchPool, Uuring[] resultPool) {
+        if (searchPool.length + resultPool.length == this.kriteerium.getMinValim()) {
             resultPool = Stream.concat(Arrays.stream(searchPool),Arrays.stream(resultPool)).toArray(Uuring[]::new);
+            searchPool = new Uuring[0];
         }
-        // Kui pole enam millegi seast otsida
         if (searchPool.length == 0) {
-            double keskmine = Stream.of(resultPool).mapToDouble(Uuring::getKaal).sum() / resultPool.length;
-            double hälve = Math.abs(keskKaal - keskmine);
-            boolean piirides = hälve < this.mootemaaramatus;
-            if (piirides) {
-                return resultPool;
-            }
-            else {
-                if (this.bestValimiKandidaat[1] > hälve | this.bestValimiKandidaat[0] == 0) {
-                    this.bestValimiKandidaat[0] = keskmine;
-                    this.bestValimiKandidaat[1] = hälve;
-                }
-                return null;
-            }
+            return new Valim(this.kriteerium,this.uuringType,Arrays.asList(resultPool));
         }
-        Uuring[] skipLast = null;
-        if (searchPool.length >= minValim) {
+        Valim skipLast = null;
+        if (searchPool.length >= this.kriteerium.getMinValim()) {
             skipLast = findValim(Arrays.copyOf(searchPool, searchPool.length - 1), Arrays.copyOf(resultPool, resultPool.length));
         }
         Uuring[] extResultPool = new Uuring[resultPool.length + 1];
         System.arraycopy(resultPool, 0, extResultPool, 0, resultPool.length);
         extResultPool[extResultPool.length - 1] = searchPool[searchPool.length - 1];
-        Uuring[] inclLast = findValim(Arrays.copyOf(searchPool, searchPool.length - 1), extResultPool);
+        Valim inclLast = findValim(Arrays.copyOf(searchPool, searchPool.length - 1), extResultPool);
 
-        if (skipLast == null && inclLast == null) {
-            return null;
+        if (skipLast == null) {
+            return inclLast;
         }
-        else if (skipLast != null && inclLast != null) {
-            if (inclLast.length < skipLast.length) {
-                return inclLast;
-            }
-            else {
-                return skipLast;
-            }
-        }
-        else if (skipLast == null) {
+        else if (skipLast.compareTo(inclLast) < 0) {
             return inclLast;
         }
         else {

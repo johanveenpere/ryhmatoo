@@ -1,24 +1,15 @@
 package Service;
 
 public class PuudulikValimException extends RuntimeException{
-    private int uuringuidPuudu;
-    private double hetkeKeskmine;
+    private final Valim valim;
     public enum exceptionTypes {
-        VALIMI_KRITEERIUMID_SEADMATA, SOBIMATU_KAALUKESKMINE, UURINGUTE_MIINIMUM_TÄITMATA
+        SOBIMATU_KAALUKESKMINE, UURINGUTE_MIINIMUM_TÄITMATA
     }
-    public PuudulikValimException(exceptionTypes exceptionType) {
+    public PuudulikValimException(exceptionTypes exceptionType, Valim valim) {
         super(String.valueOf(exceptionType));
+        this.valim = valim;
     }
-    public void setUuringuidPuudu(int uuringuidPuudu) {
-        this.uuringuidPuudu = uuringuidPuudu;
-    }
-    public int getUuringuidPuudu() {
-        return uuringuidPuudu;
-    }
-    public double getHetkeKeskmine() {
-        return hetkeKeskmine;
-    }
-    public void setHetkeKeskmine(double hetkeKeskmine) {
-        this.hetkeKeskmine = hetkeKeskmine;
+    public Valim getValim() {
+        return valim;
     }
 }

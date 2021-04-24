@@ -1,6 +1,8 @@
 package Model;
 
 import javax.persistence.*;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 @Entity
@@ -15,6 +17,8 @@ public abstract class Uuring implements Comparable<Uuring> {
     private String sugu;
     @Column
     private int vanus;
+    @Column
+    private OffsetDateTime kuupäev;
 
     public Uuring() {
     }
@@ -25,6 +29,12 @@ public abstract class Uuring implements Comparable<Uuring> {
     protected Uuring(String viit, double kaal) {
         this.viit = viit;
         this.kaal = kaal;
+        this.kuupäev = OffsetDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+    }
+    protected Uuring(String viit, double kaal, OffsetDateTime kuupäev) {
+        this.viit = viit;
+        this.kaal = kaal;
+        this.kuupäev = kuupäev;
     }
 
     /**
@@ -62,12 +72,36 @@ public abstract class Uuring implements Comparable<Uuring> {
 
     public abstract Map<String, String> getAtribuudid();
 
-    public String toString(){
-        return this.viit + ", " + this.kaal  + ", " + this.vanus + ", " + this.sugu;
+    public OffsetDateTime getKuupäev() {
+        return kuupäev;
+    }
+
+    public void setKuupäev(OffsetDateTime kuupäev) {
+        this.kuupäev = kuupäev;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() +
+                "={viit='" + viit + '\'' +
+                ", kaal=" + kaal +
+                ", sugu='" + sugu + '\'' +
+                ", vanus=" + vanus +
+                ", kuupäev=" + kuupäev +
+                '}';
+    }
+
+    public String simpleString() {
+        return "viit='" + viit + '\'' +
+                ", kaal=" + kaal +
+                ", sugu='" + sugu + '\'' +
+                ", vanus=" + vanus +
+                ", kuupäev=" + kuupäev;
     }
 
     @Override
     public int compareTo(Uuring o) {
         return Double.compare(this.kaal, o.kaal);
     }
+
 }

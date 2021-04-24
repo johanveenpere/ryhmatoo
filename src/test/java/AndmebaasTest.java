@@ -3,14 +3,17 @@ import javax.persistence.*;
 import Model.NimmelülidUuring;
 import Model.PeaNatiivUuring;
 import Model.RindkereUuring;
-import Model.Uuring;
 import Repository.UuringRepository;
+import Service.Kriteerium;
 import Service.PuudulikValimException;
+import Service.Valim;
 import Service.ValimiSelekteerija;
 
-import java.util.List;
+import java.sql.Timestamp;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static java.lang.Math.round;
 
@@ -19,18 +22,19 @@ public class AndmebaasTest {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("default");
         try {
             populateTables(30, emf);
-            ValimiSelekteerija<PeaNatiivUuring> selekteerija = new ValimiSelekteerija<PeaNatiivUuring>(emf, PeaNatiivUuring.class, 80, 20, 50,5, 1);
-            List<Uuring> valim = selekteerija.getValim();
-            System.out.println(valim.stream().map(Uuring::toString).collect(Collectors.joining(",\n")));
-            System.out.println("SIZE: " + valim.size() + ", SUM: " + valim.stream().mapToDouble(Uuring::getKaal).sum() + ", KESKMINE: " + valim.stream().mapToDouble(Uuring::getKaal).sum() / valim.size());
+            OffsetDateTime test = OffsetDateTime.of(2020,1,1,1,1,1,1, ZoneOffset.UTC);
+            Kriteerium kriteerium = new Kriteerium(80,60,65,1,5, test);
+            ValimiSelekteerija<PeaNatiivUuring> selekteerija = new ValimiSelekteerija<>(PeaNatiivUuring.class, emf, kriteerium);
+            Valim valim = selekteerija.getValim();
+            System.out.println(valim.toString());
         }
         catch (PuudulikValimException e) {
             System.out.println(e.getMessage());
             if (e.getMessage() == PuudulikValimException.exceptionTypes.SOBIMATU_KAALUKESKMINE.toString()) {
-                System.out.println("HETKE KESKMINE: " + e.getHetkeKeskmine());
+                System.out.println(e.getValim().toString());
             }
             else if (e.getMessage() == PuudulikValimException.exceptionTypes.UURINGUTE_MIINIMUM_TÄITMATA.toString()) {
-                System.out.println("UURINGUID PUUDU: " + e.getUuringuidPuudu());
+                System.out.println(e.getValim().toString());
             }
         }
         finally {
