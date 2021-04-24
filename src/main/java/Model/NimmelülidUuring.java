@@ -19,15 +19,9 @@ public class NimmelülidUuring extends Uuring {
     private double distanceSourceToPatientAP;
     @Column
     private double distanceSourceToPatientLL;
-    Map<String, AttributeTag> atribuudid;
 
     public NimmelülidUuring(String viit, double kaal) {
         super(viit, kaal);
-        atribuudid = new HashMap<>(Map.of(
-                "Key", TagFromName.ViewPosition,
-                "DoseAreaProduct", new AttributeTag(0x0018,0x115E)
-                //, "DistanceSourceToPatient", TagFromName.DistanceSourceToPatient
-        ));
     }
 
     public NimmelülidUuring() {}
@@ -64,17 +58,12 @@ public class NimmelülidUuring extends Uuring {
         this.distanceSourceToPatientLL = distanceSourceToPatientLL;
     }
 
-    @Override
-    public Map<String, String> getAtribuudid() {
-        return new HashMap<>(Map.of(
-                "Key", "00185101",
-                "Sugu", "00100040",
-                "Vanus", "00101010",
-                "DoseAreaProduct", "0018115e",
-                "DistanceSourceToPatient", "00181110"
-        ));
     public Map<String, AttributeTag> getEriAtribuudid() {
-        return atribuudid;
+        return new HashMap<>(Map.of(
+                "Key", TagFromName.ViewPosition,
+                "DoseAreaProduct", new AttributeTag(0x0018,0x115E)
+                //, "DistanceSourceToPatient", TagFromName.DistanceSourceToPatient
+        ));
     }
 
     public String toString() {

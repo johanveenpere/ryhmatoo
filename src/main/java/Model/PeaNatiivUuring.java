@@ -1,6 +1,6 @@
-import com.pixelmed.dicom.AttributeTag;
-
 package Model;
+
+import com.pixelmed.dicom.AttributeTag;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

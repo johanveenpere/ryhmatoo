@@ -14,21 +14,19 @@ public class RindkereUuring extends Uuring {
     private double doseAreaProduct;
     @Column
     private double distanceSourceToPatient;
-    Map<String, AttributeTag> eriAtribuudid;
 
     public RindkereUuring(){};
 
     public RindkereUuring(String viit, double kaal) {
         super(viit, kaal);
-        eriAtribuudid = new HashMap<>(Map.of(
-                "DoseAreaProduct", new AttributeTag(0x0018,0x115E)
-                //,"DistanceSourceToPatient", TagFromName.DistanceSourceToPatient
-        ));
     }
 
     @Override
     public Map<String, AttributeTag> getEriAtribuudid() {
-        return eriAtribuudid;
+        return new HashMap<>(Map.of(
+                "DoseAreaProduct", new AttributeTag(0x0018,0x115E)
+                //,"DistanceSourceToPatient", TagFromName.DistanceSourceToPatient
+        ));
     }
 
     public double getDoseAreaProduct() {
