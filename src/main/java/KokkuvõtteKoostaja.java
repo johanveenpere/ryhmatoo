@@ -1,7 +1,8 @@
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+
 import Model.Uuring;
+
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
 
@@ -13,19 +14,20 @@ public class KokkuvõtteKoostaja {
         File csvOutputFile = new File(failinimi);
         csvOutputFile.createNewFile();
 
-        try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
+        try (OutputStream os = new FileOutputStream(csvOutputFile);
+                PrintWriter pw = new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8))) {
             String klass = uuringud.get(0).getClass().getSimpleName();
             String klasstemp;
             pw.println(klass);
-            pw.println(uuringud.get(0).toStringVäljadeNimed());
+            pw.println(uuringud.get(0).toCSVStringVäljadeNimed());
             for (Uuring uuring : uuringud) {
                 klasstemp = uuring.getClass().getSimpleName();
                 if (!klass.equals(klasstemp)) {
                     pw.println(klasstemp);
-                    pw.println(uuring.toStringVäljadeNimed());
+                    pw.println(uuring.toCSVStringVäljadeNimed());
                     klass = klasstemp;
                 }
-                pw.println(uuring.toString());
+                pw.println(uuring.toCSVString());
             }
         }
     }
