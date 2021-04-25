@@ -22,6 +22,7 @@ public class KujutiseFailiLugejaTest {
 
         KujutiseFailiLugeja.loeKujutiseFailist(nimmelülidUuring,failid);
 
+        assertEquals("TUKRAX1",nimmelülidUuring.getSeade());
         assertEquals("M",nimmelülidUuring.getSugu());
         assertEquals(31,nimmelülidUuring.getVanus());
         assertEquals(0.213,nimmelülidUuring.getDoseAreaProductAP());
@@ -37,6 +38,7 @@ public class KujutiseFailiLugejaTest {
 
         KujutiseFailiLugeja.loeKujutiseFailist(rindkereUuring,failid);
 
+        assertEquals("TUKRAX1",rindkereUuring.getSeade());
         assertEquals("O",rindkereUuring.getSugu());
         assertEquals(31,rindkereUuring.getVanus());
         assertEquals(0.248,rindkereUuring.getDoseAreaProduct());

@@ -1,8 +1,11 @@
 package Model;
 
+import com.pixelmed.dicom.AttributeTag;
+import com.pixelmed.dicom.TagFromName;
+
 import javax.persistence.*;
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 @Entity
@@ -18,10 +21,13 @@ public abstract class Uuring implements Comparable<Uuring> {
     @Column
     private int vanus;
     @Column
-    private OffsetDateTime kuupäev;
+    private String seade;
+    @Column
+    private LocalDate kuupäev;
 
     public Uuring() {
     }
+
     /**
      * Konstruktorit kutsutakse ainult läbi alamklassi. Isend luuakse viida ja kaalu sisestamisel tehniku poolt.
      * Ülejäänud isendiväljade täitmine toimub pärast andmete lugemist pildiinfost set-meetodite abil.
@@ -29,12 +35,6 @@ public abstract class Uuring implements Comparable<Uuring> {
     protected Uuring(String viit, double kaal) {
         this.viit = viit;
         this.kaal = kaal;
-        this.kuupäev = OffsetDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-    }
-    protected Uuring(String viit, double kaal, OffsetDateTime kuupäev) {
-        this.viit = viit;
-        this.kaal = kaal;
-        this.kuupäev = kuupäev;
     }
 
     /**
@@ -66,19 +66,33 @@ public abstract class Uuring implements Comparable<Uuring> {
         this.vanus = vanus;
     }
 
-    public void setVanus(String vanus) {
-        this.vanus = Integer.parseInt(vanus.substring(0,3));
+    public void setSeade(String seade) {
+        this.seade = seade;
     }
 
-    public abstract Map<String, String> getAtribuudid();
+    public void setKuupäev(LocalDate kuupäev) {
+        this.kuupäev = kuupäev;
+    }
 
-    public OffsetDateTime getKuupäev() {
+    public String getSeade() {
+        return seade;
+    }
+
+    public LocalDate getKuupäev() {
         return kuupäev;
     }
 
-    public void setKuupäev(OffsetDateTime kuupäev) {
-        this.kuupäev = kuupäev;
+    public Map<String, AttributeTag> getPõhiAtribuudid() {
+        return new HashMap<>(Map.of(
+                "Sugu", TagFromName.PatientSex,
+                "Vanus", TagFromName.PatientAge,
+                "Seade", TagFromName.StationName,
+                "Kuupäev", TagFromName.AcquisitionDate
+        ));
     }
+
+    public abstract Map<String, AttributeTag> getEriAtribuudid();
+
 
     @Override
     public String toString() {
@@ -97,6 +111,24 @@ public abstract class Uuring implements Comparable<Uuring> {
                 ", sugu='" + sugu + '\'' +
                 ", vanus=" + vanus +
                 ", kuupäev=" + kuupäev;
+    }
+
+    public String toCSVStringVäljadeNimed() {
+        return "Kuupäev, " +
+                "Seade, " +
+                "Viit, " +
+                "Kaal, " +
+                "Vanus, " +
+                "Sugu";
+    }
+
+    public String toCSVString() {
+        return this.kuupäev + ", "
+                + this.seade + ", "
+                + this.viit + ", "
+                + this.kaal + ", "
+                + this.vanus + ", "
+                + this.sugu;
     }
 
     @Override
