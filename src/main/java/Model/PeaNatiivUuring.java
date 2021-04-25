@@ -4,8 +4,6 @@ import com.pixelmed.dicom.AttributeTag;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
-import java.util.HashMap;
 import java.util.Map;
 
 @Entity
@@ -14,14 +12,11 @@ public class PeaNatiivUuring extends Uuring {
     private double compTomoDoseIndex; //Computed Tomography Dose Index
     @Column
     private double doseLengthProduct; // Dose-length Product
-    @Transient
-    private String protocolKey;
 
     public PeaNatiivUuring() {};
 
     public PeaNatiivUuring(String viit, double kaal) {
         super(viit, kaal);
-        protocolKey = "Rinnalylid";
     }
 
     @Override
@@ -37,20 +32,16 @@ public class PeaNatiivUuring extends Uuring {
         return doseLengthProduct;
     }
 
-    public void setCTDIvol(float cTDIvol) {
+    public void setCTDIvol(double cTDIvol) {
         this.compTomoDoseIndex = cTDIvol;
     }
 
-    public void setDLP(float dLP) {
+    public void setDLP(double dLP) {
         this.doseLengthProduct = dLP;
     }
 
-    public String getProtocolKey() {
-        return protocolKey;
-    }
-
-    public void setProtocolKey(String protocolKey) {
-        this.protocolKey = protocolKey;
+    public String getAcquisitionKey() {
+        return "Rinnalylid";
     }
 
     public Map<String, String> getAtribuudid() {
