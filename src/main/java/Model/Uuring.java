@@ -27,6 +27,7 @@ public abstract class Uuring implements Comparable<Uuring> {
 
     public Uuring() {
     }
+
     /**
      * Konstruktorit kutsutakse ainult läbi alamklassi. Isend luuakse viida ja kaalu sisestamisel tehniku poolt.
      * Ülejäänud isendiväljade täitmine toimub pärast andmete lugemist pildiinfost set-meetodite abil.
@@ -86,9 +87,10 @@ public abstract class Uuring implements Comparable<Uuring> {
                 "Sugu", TagFromName.PatientSex,
                 "Vanus", TagFromName.PatientAge,
                 "Seade", TagFromName.StationName,
-                "Kuupäev",TagFromName.AcquisitionDate
+                "Kuupäev", TagFromName.AcquisitionDate
         ));
     }
+
     public abstract Map<String, AttributeTag> getEriAtribuudid();
 
 
@@ -111,8 +113,22 @@ public abstract class Uuring implements Comparable<Uuring> {
                 ", kuupäev=" + kuupäev;
     }
 
-    public String toCSVString(){
-        return this.kuupäev + ", " +this.seade + ", " + this.viit + ", " + this.kaal  + ", " + this.vanus + ", " + this.sugu;
+    public String toCSVStringVäljadeNimed() {
+        return "Kuupäev, " +
+                "Seade, " +
+                "Viit, " +
+                "Kaal, " +
+                "Vanus, " +
+                "Sugu";
+    }
+
+    public String toCSVString() {
+        return this.kuupäev + ", "
+                + this.seade + ", "
+                + this.viit + ", "
+                + this.kaal + ", "
+                + this.vanus + ", "
+                + this.sugu;
     }
 
     @Override

@@ -45,8 +45,19 @@ public class RindkereUuring extends Uuring {
         this.distanceSourceToPatient = distanceSourceToPatient;
     }
 
-    public String toString(){
-        return super.toString() + ", " + doseAreaProduct + ", " + distanceSourceToPatient;
+    @Override
+    public String toCSVStringVäljadeNimed() {
+        return super.toCSVStringVäljadeNimed() + ", " +
+                "DAP, " +
+                "DSP";
+
+    }
+
+    @Override
+    public String toCSVString(){
+        return super.toCSVString() + ", "
+                + doseAreaProduct + ", "
+                + distanceSourceToPatient;
     }
 
 }

@@ -13,7 +13,10 @@ public class PeaNatiivUuring extends Uuring {
     @Column
     private double doseLengthProduct; // Dose-length Product
 
-    public PeaNatiivUuring() {};
+    public PeaNatiivUuring() {
+    }
+
+    ;
 
     public PeaNatiivUuring(String viit, double kaal) {
         super(viit, kaal);
@@ -48,7 +51,18 @@ public class PeaNatiivUuring extends Uuring {
         return null;
     }
 
-    public String toString(){
-        return super.toString() + ", " + compTomoDoseIndex + ", " + doseLengthProduct;
+    @Override
+    public String toCSVStringVäljadeNimed() {
+        return super.toCSVStringVäljadeNimed() + ", " +
+                "CTDIvol, " +
+                "DLP";
+
+    }
+
+    @Override
+    public String toCSVString() {
+        return super.toCSVString() + ", "
+                + compTomoDoseIndex + ", "
+                + doseLengthProduct;
     }
 }
