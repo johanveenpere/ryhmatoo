@@ -1,12 +1,12 @@
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pixelmed.dicom.*;
 
-import javax.json.JsonArray;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import Model.Uuring;
 import java.util.*;
 
 /**
@@ -16,74 +16,75 @@ import java.util.*;
 public class KujutiseFailiLugeja {
 
     /**
-     * Loeb Uuring isendiväljadele väärtused failidest. Loeb vajadusel nii ühest kui mitmest failist. Kasutab parameetriks antud Uuring isendi getAtribuudid() meetodit info saamiseks, mida on vaja failidest lugeda.
+     * Loeb Uuring isendiväljadele väärtused failidest. Loeb vajadusel nii ühest kui mitmest failist.
+     * Kasutab parameetriks antud Uuring isendi getAtribuudid() meetodit info saamiseks, mida on vaja failidest lugeda.
      *
      * @param uuring - Uuring isend, kuhu hakatakse väärtuseid lugema.
      * @param failid - List<File> failidega
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
+     * @throws NoSuchMethodException     - uuring isendil puudub set-meetod mida väljade täitmisel kutsutakse
+     * @throws InvocationTargetException - kutsutud meetodi visatud ja wrapitud erind
+     * @throws IllegalAccessException    - kutsutud meetodile pole ligipääsuõigust
      * @throws IOException
-     * @throws DicomException
+     * @throws DicomException            - atribuutide nimekirja failist lugemise viga
      */
     public static void loeKujutiseFailist(Uuring uuring, List<File> failid) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException, DicomException {
+        AttributeList põhiAttributeList = new AttributeList();
+        põhiAttributeList.read(failid.get(0));
+        Map<String, AttributeTag> põhiAtribuudid = new HashMap<>(uuring.getPõhiAtribuudid());
+        loeAtribuudid(põhiAtribuudid, uuring, põhiAttributeList);
         for (File fail : failid) {
-            Map<String, String> atribuudid = new HashMap<>(uuring.getAtribuudid());
-            JsonNode jsonNode = teeJsonNode(fail);
-            String key = "";
-            if (atribuudid.containsKey(("Key"))) {
-                key = loeVäärtus(jsonNode, atribuudid.get("Key"));
-                atribuudid.remove("Key");
-            }
-            for (Map.Entry<String, String> atribuut : atribuudid.entrySet()) {
-                String atribuudiVäärtus = loeVäärtus(jsonNode, atribuut.getValue());
-                Method kutsutavMeetod;
-                if (atribuut.getKey().equals("Vanus") || atribuut.getKey().equals("Sugu"))
-                    kutsutavMeetod = uuring.getClass().getDeclaredMethod("set" + atribuut.getKey(), String.class);
-                else
-                    kutsutavMeetod = uuring.getClass().getDeclaredMethod("set" + atribuut.getKey() + key, String.class);
-                kutsutavMeetod.invoke(uuring, atribuudiVäärtus);
-            }
+            AttributeList eriAttributeList = new AttributeList();
+            eriAttributeList.read(fail);
+            Map<String, AttributeTag> eriAtribuudid = new HashMap<>(uuring.getEriAtribuudid());
+            loeAtribuudid(eriAtribuudid, uuring, eriAttributeList);
         }
     }
 
-    /**
-     * Privaatne meetod väärtuse lugemiseks atribuudi koodile vastavalt Value node'ist.
-     * Atribuudile vastava välja kuju JSONisse serialiseerituna:
-     * "00181110": {
-     * "vr": "DS",
-     * "Value": [
-     * "1804"
-     * ]
-     */
-    private static String loeVäärtus(JsonNode jsonNode, String atribuut) {
-        String väärtus;
-        try {
-            väärtus = jsonNode
-                    .get(atribuut)
-                    .get("Value")
-                    .get(0)
-                    .asText();
-        } catch (NullPointerException e) {
-            return "";
+    private static void loeAtribuudid(Map<String, AttributeTag> atribuudid, Uuring uuring, AttributeList atribuutList) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String key = "";
+        if (atribuudid.containsKey(("Key"))) {
+            key = atribuutList
+                    .get(atribuudid.get("Key"))
+                    .getSingleStringValueOrEmptyString();
+            atribuudid.remove("Key");
         }
-        return väärtus;
+        for (Map.Entry<String, AttributeTag> atribuut : atribuudid.entrySet()) {
+            Class klass;
+            String atribuudiVäärtuseTüüp = atribuutList
+                    .get(atribuut.getValue())
+                    .getVRAsString();
+            Object atribuudiVäärtus;
+            switch (atribuudiVäärtuseTüüp) {
+                case "AS" -> { // Age String - vanuse edastamiseks kasutatav erivorm kujul "030Y"
+                    klass = int.class;
+                    atribuudiVäärtus = Integer.parseInt(atribuutList
+                            .get(atribuut.getValue())
+                            .getSingleStringValueOrDefault("000Y")
+                            .substring(0, 3)
+                    );
+                }
+                case "DS" -> { // Decimal String
+                    klass = double.class;
+                    atribuudiVäärtus = atribuutList
+                            .get(atribuut.getValue())
+                            .getSingleDoubleValueOrDefault(0.0);
+                }
+                case "DA" -> { // Date
+                    klass = LocalDate.class;
+                    atribuudiVäärtus = LocalDate.parse(atribuutList
+                                    .get(atribuut.getValue())
+                                    .getSingleStringValueOrDefault("19000101"),
+                            DateTimeFormatter.BASIC_ISO_DATE);
+                }
+                default -> {
+                    klass = String.class;
+                    atribuudiVäärtus = atribuutList
+                            .get(atribuut.getValue())
+                            .getSingleStringValueOrEmptyString();
+                }
+            }
+            Method kutsutavMeetod = uuring.getClass().getMethod("set" + atribuut.getKey() + key, klass);
+            kutsutavMeetod.invoke(uuring, atribuudiVäärtus);
+        }
     }
-
-    private static JsonNode teeJsonNode(File fail) throws IOException, DicomException {
-        AttributeList attributeList = new AttributeList();
-            /* AttributeList.read(...)
-              Parameters:
-              name - the input file name
-              transferSyntaxUID - the transfer syntax to use for the data set (leave null for autodetection)
-              hasMeta - look for a meta information header
-              useBufferedStream - buffer the input for better performance
-             */
-        attributeList.read(fail);
-        JsonArray jsonArray = new JSONRepresentationOfDicomObjectFactory().getDocument(attributeList);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(jsonArray.get(0).toString());
-        return jsonNode;
-    }
-
 }

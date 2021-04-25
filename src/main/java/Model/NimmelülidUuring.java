@@ -1,23 +1,30 @@
+package Model;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import com.pixelmed.dicom.AttributeTag;
+import com.pixelmed.dicom.TagFromName;
+
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+@Entity
 public class NimmelülidUuring extends Uuring {
+    @Column
     private double doseAreaProductAP;
+    @Column
     private double doseAreaProductLL;
+    @Column
     private double distanceSourceToPatientAP;
+    @Column
     private double distanceSourceToPatientLL;
-    Map<String, String> atribuudid;
 
     public NimmelülidUuring(String viit, double kaal) {
         super(viit, kaal);
-        atribuudid = new HashMap<>(Map.of(
-                "Key", "00185101",
-                "Sugu", "00100040"
-                ,"Vanus", "00101010"
-                ,"DoseAreaProduct", "0018115e"
-                , "DistanceSourceToPatient", "00181110"
-        ));
     }
+
+    public NimmelülidUuring() {}
 
     public double getDoseAreaProductAP() {
         return doseAreaProductAP;
@@ -51,44 +58,16 @@ public class NimmelülidUuring extends Uuring {
         this.distanceSourceToPatientLL = distanceSourceToPatientLL;
     }
 
-    public void setDoseAreaProductAP(String doseAreaProductAP) {
-        this.doseAreaProductAP = Double.parseDouble(doseAreaProductAP);
+    public Map<String, AttributeTag> getEriAtribuudid() {
+        return new HashMap<>(Map.of(
+                "Key", TagFromName.ViewPosition,
+                "DoseAreaProduct", new AttributeTag(0x0018,0x115E)
+                //, "DistanceSourceToPatient", TagFromName.DistanceSourceToPatient
+        ));
     }
 
-    public void setDistanceSourceToPatientAP(String distanceSourceToPatientAP) {
-        this.distanceSourceToPatientAP = Double.parseDouble(distanceSourceToPatientAP);
-    }
-
-    public void setDoseAreaProductLL(String doseAreaProductLL) {
-        this.doseAreaProductLL = Double.parseDouble(doseAreaProductLL);
-    }
-
-    public void setDistanceSourceToPatientLL(String distanceSourceToPatientLL) {
-        this.distanceSourceToPatientLL = Double.parseDouble(distanceSourceToPatientLL);
-    }
-
-    @Override
-    public Map<String, String> getAtribuudid() {
-        return atribuudid;
-    }
-
-    @Override
     public String toString() {
         return super.toString() + ", " + doseAreaProductAP + ", " + distanceSourceToPatientAP + ", " + doseAreaProductLL + ", " + distanceSourceToPatientLL;
     }
 
-    @Override
-    public String toStringVäljadeNimed() {
-        return super.toStringVäljadeNimed() + ", DAP_AP, DSP_AP, DAP_LL, DSP_LL";
-    }
-
-    @Override
-    public void setVanus(String vanus) {
-        super.setVanus(vanus);
-    }
-
-    @Override
-    public void setSugu(String sugu) {
-        super.setSugu(sugu);
-    }
 }

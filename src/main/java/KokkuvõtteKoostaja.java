@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import Model.Uuring;
+import java.util.List;
 import java.util.*;
 
 public class KokkuvõtteKoostaja {
