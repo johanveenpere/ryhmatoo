@@ -2,6 +2,10 @@ package Model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import com.pixelmed.dicom.AttributeTag;
+import com.pixelmed.dicom.TagFromName;
+
+import java.time.LocalDate;
 import java.util.*;
 
 @Entity
@@ -18,12 +22,10 @@ public class RindkereUuring extends Uuring {
     }
 
     @Override
-    public Map<String, String> getAtribuudid() {
+    public Map<String, AttributeTag> getEriAtribuudid() {
         return new HashMap<>(Map.of(
-                "Sugu", "00100040",
-                "Vanus", "00101010",
-                "DoseAreaProduct", "0018115e",
-                "DistanceSourceToPatient", "00181110"
+                "DoseAreaProduct", new AttributeTag(0x0018,0x115E)
+                //,"DistanceSourceToPatient", TagFromName.DistanceSourceToPatient
         ));
     }
 
@@ -43,25 +45,19 @@ public class RindkereUuring extends Uuring {
         this.distanceSourceToPatient = distanceSourceToPatient;
     }
 
-    public void setDoseAreaProduct(String doseAreaProduct) {
-        this.doseAreaProduct = Double.parseDouble(doseAreaProduct);
-    }
+    @Override
+    public String toCSVStringVäljadeNimed() {
+        return super.toCSVStringVäljadeNimed() + ", " +
+                "DAP, " +
+                "DSP";
 
-    public void setDistanceSourceToPatient(String distanceSourceToPatient) {
-        this.distanceSourceToPatient = Double.parseDouble(distanceSourceToPatient);
-    }
-
-    public String toString(){
-        return super.toString() + ", " + doseAreaProduct + ", " + distanceSourceToPatient;
     }
 
     @Override
-    public void setSugu(String sugu) {
-        super.setSugu(sugu);
+    public String toCSVString(){
+        return super.toCSVString() + ", "
+                + doseAreaProduct + ", "
+                + distanceSourceToPatient;
     }
 
-    @Override
-    public void setVanus(String vanus) {
-        super.setVanus(vanus);
-    }
 }
