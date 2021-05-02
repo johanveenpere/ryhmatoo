@@ -1,5 +1,8 @@
 package Model;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -7,6 +10,7 @@ import java.util.Map;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@OnDelete(action = OnDeleteAction.CASCADE)
 @Table(name = "UURING")
 public abstract class Uuring implements Comparable<Uuring> {
     @Id

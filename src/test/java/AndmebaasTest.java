@@ -21,9 +21,9 @@ public class AndmebaasTest {
     public static void main(String[] args) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("default");
         try {
-            populateTables(30, emf);
+            populateTables(400, emf);
             OffsetDateTime test = OffsetDateTime.of(2020,1,1,1,1,1,1, ZoneOffset.UTC);
-            Kriteerium kriteerium = new Kriteerium(80,60,65,1,5, test);
+            Kriteerium kriteerium = new Kriteerium(80,60,65,1,20, test);
             ValimiSelekteerija<PeaNatiivUuring> selekteerija = new ValimiSelekteerija<>(PeaNatiivUuring.class, emf, kriteerium);
             Valim valim = selekteerija.getValim();
             System.out.println(valim.toString());

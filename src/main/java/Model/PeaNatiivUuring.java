@@ -38,6 +38,7 @@ public class PeaNatiivUuring extends Uuring {
         this.doseLengthProduct = dLP;
     }
 
+    @Override
     public String toString(){
         return super.toString() + ", " + compTomoDoseIndex + ", " + doseLengthProduct;
     }
