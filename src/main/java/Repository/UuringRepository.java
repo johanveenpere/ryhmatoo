@@ -5,6 +5,7 @@ import Service.Kriteerium;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import java.util.List;
 
 public class UuringRepository {
@@ -45,6 +46,18 @@ public class UuringRepository {
         this.em.getTransaction().commit();
     }
 
+    public void removeUuring(Uuring uuring) {
+        this.em.getTransaction().begin();
+        this.em.remove(uuring);
+        this.em.getTransaction().commit();
+    }
+
+    public void deleteAll() {
+        this.em.getTransaction().begin();
+        this.em.createQuery("DELETE from Uuring").executeUpdate();
+        this.em.getTransaction().commit();
+    }
+
     /**
      * Tagasta andmebaasist kõik uuringud mis on teatud Uuringu tüüpi.
      * @param uuringType Uuring klass mis uuringuid soovitakse väljastada
@@ -63,6 +76,6 @@ public class UuringRepository {
      * @return List soovitud Uuring objektidest mis vastavad min/max kaalu kriteeriumitele
      */
     public <T extends Uuring> List<Uuring> getValimiKandidaadid(Class<T> uuringType, Kriteerium kriteerium) {
-        return this.em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c WHERE c.kaal < " + kriteerium.getMaxKaal() + " AND c.kaal > " + kriteerium.getMinKaal(), Uuring.class).getResultList();
+        return this.em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c WHERE c.kaal <= " + kriteerium.getMaxKaal() + " AND c.kaal >= " + kriteerium.getMinKaal(), Uuring.class).getResultList();
     }
 }

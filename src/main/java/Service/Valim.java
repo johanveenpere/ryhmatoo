@@ -2,6 +2,7 @@ package Service;
 
 import Model.Uuring;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ public class Valim implements Comparable<Valim>{
             this.hälve = Math.round(Math.abs(kriteerium.getKeskKaal() - this.keskKaal)*100) / (double) 100;
             this.suurus = uuringud.size();
 
-            this.inMõõtemääramatus = this.hälve < this.kriteerium.getMootemaaramatus();
+            this.inMõõtemääramatus = this.hälve <= this.kriteerium.getMootemaaramatus();
             this.miinimumTäidetud = this.suurus >= this.kriteerium.getMinValim();
             this.vastabKriteeriumitele = this.inMõõtemääramatus && this.miinimumTäidetud;
         }
@@ -72,9 +73,10 @@ public class Valim implements Comparable<Valim>{
         return miinimumTäidetud;
     }
 
+
     @Override
     public String toString() {
-        String header = "Uuring=" + this.uuringType.getSimpleName() + ", " + kriteerium.toString() + ", uuringuid=" + this.suurus + ", keskmine=" + this.keskKaal + ", hälve=" + this.hälve + ", vastab kriteeriumitele=" + this.vastabKriteeriumitele + "\n";
+        String header = "Uuring=" + this.uuringType.getSimpleName() + ", " + kriteerium.toString() + ", uuringuid=" + this.suurus + ", keskmine=" + this.keskKaal + ", hälve=" + this.hälve + ", kaalunormis=" + this.inMõõtemääramatus +  ", miinimum täidetud=" + this.miinimumTäidetud + "\n";
         String uuringud;
         if (this.uuringud != null) {
             uuringud = this.uuringud.stream().map(Uuring::simpleString).collect(Collectors.joining(", \n"));
@@ -95,10 +97,16 @@ public class Valim implements Comparable<Valim>{
                     return suurus;
                 }
             }
-            return Double.compare(o.hälve, this.hälve);
+            int kumbMõõtemääramatuses = Boolean.compare(this.inMõõtemääramatus,o.inMõõtemääramatus);
+            int kumbVäiksem =  Integer.compare(o.suurus,this.suurus);
+            if (kumbMõõtemääramatuses == 0) {
+                if (this.inMõõtemääramatus && kumbVäiksem != 0) {
+                    return kumbVäiksem;
+                }
+                return Double.compare(o.hälve, this.hälve);
+            }
+            return kumbMõõtemääramatuses;
         }
-        else {
-            return miinimumTäidetud;
-        }
+        return miinimumTäidetud;
     }
 }
