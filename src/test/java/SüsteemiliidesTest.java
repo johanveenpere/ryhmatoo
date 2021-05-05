@@ -13,21 +13,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SüsteemiliidesTest {
 
-    EntityManagerFactory emf;
-    EntityManager em;
-    Süsteemiliides liides;
-    UuringRepository db;
+    static EntityManagerFactory emf;
+    static EntityManager em;
+    static Süsteemiliides liides;
+    static UuringRepository db;
 
     @BeforeAll
-    void setUp(){
-        emf = Persistence.createEntityManagerFactory("SüsteemiliidesTest");
+    static void setUp(){
+        emf = Persistence.createEntityManagerFactory("default");
         em = emf.createEntityManager();
         db = new UuringRepository(emf, em);
         liides = new Süsteemiliides(db);
     }
 
     @AfterAll
-    void tearDown(){
+    static void tearDown(){
         emf.close();
         em.close();
     }

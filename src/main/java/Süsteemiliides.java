@@ -13,6 +13,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Süsteemiliides {
@@ -43,9 +44,13 @@ public class Süsteemiliides {
       db.addUuring(uuring);
    }
 
-   public void TäidaPuuduvadUuringud(){
-      //List<Uuring> uuringud = db.getPoolikudUuringud();
-
+   public void TäidaPuuduvadUuringud(String tempPildikaust){
+      List<Uuring> uuringud = new ArrayList<>();//db.getPoolikudUuringud();
+      List<String> tõmmatudFailideTeed = new ArrayList<>();
+      CGetUuringud serveriühendus = new CGetUuringud();
+      for (Uuring uuring : uuringud) {
+         tõmmatudFailideTeed.add(serveriühendus.TõmbaUuringud(uuring.getViit(), tempPildikaust));
+      }
    }
 
    public void setKriteerium(Kriteerium kriteerium) {
