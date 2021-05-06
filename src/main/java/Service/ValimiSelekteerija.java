@@ -34,7 +34,7 @@ public class ValimiSelekteerija <T extends Uuring> {
     public Valim getValim() throws PuudulikValimException {
         EntityManager em = emf.createEntityManager();
         try {
-            UuringRepository repo = new UuringRepository(this.emf,em);
+            UuringRepository repo = new UuringRepository(this.emf);
             Valim sorteerimataValim = new Valim(kriteerium, uuringType, repo.getValimiKandidaadid(uuringType, kriteerium));
             if (!sorteerimataValim.isMiinimumTäidetud()) {
                 throw new PuudulikValimException(UURINGUTE_MIINIMUM_TÄITMATA, sorteerimataValim);

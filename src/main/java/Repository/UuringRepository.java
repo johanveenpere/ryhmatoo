@@ -11,9 +11,9 @@ public class UuringRepository {
     protected EntityManagerFactory emf;
     protected EntityManager em;
 
-    public UuringRepository(EntityManagerFactory emf, EntityManager em) {
+    public UuringRepository(EntityManagerFactory emf) {
         this.emf = emf;
-        this.em = em;
+        em = emf.createEntityManager();
     }
 
     /**
