@@ -92,7 +92,7 @@ public class AndmebaasTest {
                 nimmelülidUuring.setDistanceSourceToPatientAP(genRandomDouble(0,200));
                 nimmelülidUuring.setDistanceSourceToPatientLL(genRandomDouble(0,200));
 
-                UuringRepository repo = new UuringRepository(emf, em);
+                UuringRepository repo = new UuringRepository(emf);
                 repo.addUuring(rindkereUuring);
                 repo.addUuring(peaNatiivUuring);
                 repo.addUuring(nimmelülidUuring);
