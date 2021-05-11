@@ -1,12 +1,12 @@
 package Service;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 public class Kriteerium {
     private final double maxKaal;
     private final double minKaal;
     private final double keskKaal;
-    private final OffsetDateTime alguskuupäev;
+    private final LocalDate alguskuupäev;
 
     private final double mootemaaramatus;
     private final int minValim;
@@ -31,11 +31,11 @@ public class Kriteerium {
         return minValim;
     }
 
-    public OffsetDateTime getAlguskuupäev() {
+    public LocalDate getAlguskuupäev() {
         return alguskuupäev;
     }
 
-    public Kriteerium(double maxKaal, double minKaal, double keskKaal, double mootemaaramatus, int minValim, OffsetDateTime alguskuupäev) {
+    public Kriteerium(double maxKaal, double minKaal, double keskKaal, double mootemaaramatus, int minValim, LocalDate alguskuupäev) {
         this.maxKaal = maxKaal;
         this.minKaal = minKaal;
         this.keskKaal = keskKaal;
