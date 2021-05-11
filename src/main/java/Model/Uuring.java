@@ -1,5 +1,6 @@
 package Model;
 
+import Service.Kriteerium;
 import com.pixelmed.dicom.AttributeTag;
 import com.pixelmed.dicom.TagFromName;
 
@@ -24,6 +25,12 @@ public abstract class Uuring implements Comparable<Uuring> {
     private String seade;
     @Column
     private LocalDate kuupäev;
+    @Column
+    private boolean andmedlaetud;
+    @Transient
+    private String uuringunimetus;
+    @Transient
+    private Kriteerium kriteerium;
 
     public Uuring() {
     }
@@ -35,6 +42,7 @@ public abstract class Uuring implements Comparable<Uuring> {
     protected Uuring(String viit, double kaal) {
         this.viit = viit;
         this.kaal = kaal;
+        this.andmedlaetud = false;
     }
 
     /**
@@ -80,6 +88,30 @@ public abstract class Uuring implements Comparable<Uuring> {
 
     public LocalDate getKuupäev() {
         return kuupäev;
+    }
+
+    public void setUuringunimetus(String uuringunimetus) {
+        this.uuringunimetus = uuringunimetus;
+    }
+
+    public String getUuringunimetus() {
+        return uuringunimetus;
+    }
+
+    public void setAndmedlaetud(boolean andmedlaetud) {
+        this.andmedlaetud = andmedlaetud;
+    }
+
+    public boolean isAndmedlaetud() {
+        return andmedlaetud;
+    }
+
+    public void setKriteerium(Kriteerium kriteerium) {
+        this.kriteerium = kriteerium;
+    }
+
+    public Kriteerium getKriteerium() {
+        return kriteerium;
     }
 
     public Map<String, AttributeTag> getPõhiAtribuudid() {
