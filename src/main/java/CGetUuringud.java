@@ -8,6 +8,11 @@ import java.util.Set;
 
 public class CGetUuringud implements Serveriühendus {
 
+    public static void main(String[] args) {
+        CGetUuringud ühendus = new CGetUuringud();
+        ühendus.TõmbaUuringud("HTYKRG12103221BB", "kaust");
+    }
+
     @Override
     public String TõmbaUuringud(String pildiviit, String failiTee) {
         try {
@@ -24,7 +29,7 @@ public class CGetUuringud implements Serveriühendus {
 
         } catch (Exception e) {
             e.printStackTrace(System.err);
-            System.exit(0);
+            System.exit(1);
         }
 
         return failiTee;
