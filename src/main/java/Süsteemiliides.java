@@ -73,4 +73,7 @@ public class Süsteemiliides {
         }
     }
 
+    public UuringRepository getDb() {
+        return db;
+    }
 }
