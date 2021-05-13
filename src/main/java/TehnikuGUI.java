@@ -1,66 +1,74 @@
-import Model.NimmelülidUuring;
-import Model.PeaNatiivUuring;
-import Model.RindkereUuring;
 import Model.Uuring;
-import Repository.UuringRepository;
-import Service.Kriteerium;
-import Service.Valim;
+import Repository.TühiUuringulistException;
+import Service.*;
 import javafx.application.Application;
-import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import java.lang.reflect.Constructor;
+import javax.persistence.EntityExistsException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.List;
+import java.util.prefs.*;
 
 public class TehnikuGUI extends Application {
+    private Preferences prefs;
+    private final String modaliteetpref = "modaliteedivalik";
+    private final String seadmenimipref = "seadmenimi";
+
+    private Süsteemiliides süsteemiliides;
+    private Konfiguratsioonid konfiguratsioonid;
+    private Label seadmenimetussilt;
+    private ComboBox<String> uuringunimetusedvalik;
+    private ObservableList<Valim> valimidstaatuslist;
+    private ObservableList<Uuring> viimaseduuringudlist;
+    private ObservableList<String> uuringuvaliklist;
+    private Label teade;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage peaLava) throws Exception, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public void start(Stage peaLava) {
+        seadmenimetussilt = new Label();
+        uuringunimetusedvalik = new ComboBox<>();
+        valimidstaatuslist = FXCollections.observableArrayList();
+        viimaseduuringudlist = FXCollections.observableArrayList();
 
-        Map<String,Class<? extends Uuring>> uuringutüübid = new HashMap<>();
-        uuringutüübid.put("Rindkere PA",RindkereUuring.class);
-        uuringutüübid.put("Nimmelülid AP/LAT",NimmelülidUuring.class);
-        uuringutüübid.put("Pea KT natiiv",PeaNatiivUuring.class);
+        prefs = Preferences.userNodeForPackage(SeadedGUI.class);
+        süsteemiliides = new Süsteemiliides("default");
+        uuendaOlek();
 
-        Süsteemiliides sl = new Süsteemiliides("default");
-        Uuring nimme = new NimmelülidUuring("HTYK12212", 80.0);
-        Uuring rinna = new RindkereUuring("HTYK143412", 80.0);
-        Uuring pea = new PeaNatiivUuring("HTYK143412", 80.0);
-        sl.UusUuring("HTYK12212", 80.0,NimmelülidUuring.class);
-        sl.UusUuring("HTYK143412", 80.0,RindkereUuring.class);
-        sl.UusUuring("HTYK143416", 80.0,PeaNatiivUuring.class);
-
+        /**
+         * Juur
+         */
         VBox juur = new VBox();
         juur.setPadding(new Insets(5, 5, 5, 5));
 
         /**
-         * Esimene paan Seaded nupuga
+         * Esimene paan Seaded nupu ja olekukuvaga
          */
         BorderPane esimene = new BorderPane();
         esimene.setPadding(new Insets(10, 0, 0, 0));
 
         Button seaded = new Button("Seaded");
         esimene.setLeft(seaded);
+
+        teade = new Label();
+        teade.setPadding(new Insets(0, 20, 0, 0));
+        esimene.setRight(teade);
 
         juur.getChildren().add(esimene);
 
@@ -69,9 +77,7 @@ public class TehnikuGUI extends Application {
          */
         BorderPane teine = new BorderPane();
         teine.setPadding(new Insets(10, 0, 0, 0));
-        String seadmenimetus = "tukforce1";
 
-        Label seadmenimetussilt = new Label("Seadme nimetus: " + seadmenimetus);
         teine.setLeft(seadmenimetussilt);
 
         juur.getChildren().add(teine);
@@ -85,25 +91,23 @@ public class TehnikuGUI extends Application {
         GridPane sisestus = new GridPane();
         sisestus.setHgap(5);
 
-        Label uuringunimetus = new Label("Uuringu nimetus");
-        Label accnr = new Label("Accession number");
-        Label kaal = new Label("Kaal");
-        sisestus.addRow(0, uuringunimetus, accnr, kaal);
+        Label uuringunimetussilt = new Label("Uuringu nimetus");
+        Label viitsilt = new Label("Accession number");
+        Label kaalsilt = new Label("Kaal");
+        sisestus.addRow(0, uuringunimetussilt, viitsilt, kaalsilt);
 
-        ObservableList<String> options = FXCollections.observableArrayList(uuringutüübid.keySet());
-        ComboBox<String> uuringunimetused = new ComboBox<>(options);
-        uuringunimetused.setPrefWidth(230);
+        uuringunimetusedvalik.setPrefWidth(230);
 
-        TextField accnrsisestus = new TextField("HTYK");
-        accnrsisestus.setPrefWidth(230);
+        TextField viitsisestus = new TextField("HTYK");
+        viitsisestus.setPrefWidth(230);
 
         TextField kaalsisestus = new TextField("0.0");
         kaalsisestus.setPrefWidth(100);
 
-        Button lisa = new Button("Lisa");
-        lisa.setPrefWidth(70);
+        Button lisanupp = new Button("Lisa");
+        lisanupp.setPrefWidth(70);
 
-        sisestus.addRow(1, uuringunimetused, accnrsisestus, kaalsisestus, lisa);
+        sisestus.addRow(1, uuringunimetusedvalik, viitsisestus, kaalsisestus, lisanupp);
 
         kolmas.setTop(sisestus);
 
@@ -118,11 +122,11 @@ public class TehnikuGUI extends Application {
         BorderPane päis1 = new BorderPane();
         päis1.setPadding(new Insets(0, 0, 5, 0));
 
-        Label viimatisisestatud = new Label("Viimati sisestatud uuringud");
-        Button kustuta = new Button("Kustuta");
+        Label viimatisisestatudsilt = new Label("Viimati sisestatud uuringud");
+        Button kustutanupp = new Button("Kustuta");
 
-        päis1.setLeft(viimatisisestatud);
-        päis1.setRight(kustuta);
+        päis1.setLeft(viimatisisestatudsilt);
+        päis1.setRight(kustutanupp);
 
         neljas.setTop(päis1);
 
@@ -130,25 +134,24 @@ public class TehnikuGUI extends Application {
         rullitav1.setPrefHeight(100);
         rullitav1.setFitToWidth(true);
 
-        TableView sisestatuduuringud = new TableView();
-        sisestatuduuringud.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        TableView<Uuring> sisestatuduuringudtabel = new TableView<>();
+        sisestatuduuringudtabel.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         TableColumn<Uuring, String> veerg1 = new TableColumn<>("Uuringu nimetus");
         veerg1.setCellValueFactory(new PropertyValueFactory<>("uuringunimetus"));
+        sisestatuduuringudtabel.getColumns().add(veerg1);
 
         TableColumn<Uuring, String> veerg2 = new TableColumn<>("Accession number");
         veerg2.setCellValueFactory(new PropertyValueFactory<>("viit"));
+        sisestatuduuringudtabel.getColumns().add(veerg2);
 
         TableColumn<Uuring, String> veerg3 = new TableColumn<>("Kaal");
         veerg3.setCellValueFactory(new PropertyValueFactory<>("kaal"));
+        sisestatuduuringudtabel.getColumns().add(veerg3);
 
-        sisestatuduuringud.getColumns().addAll(veerg1, veerg2, veerg3);
+        sisestatuduuringudtabel.setItems(viimaseduuringudlist);
 
-        sisestatuduuringud.getItems().add(nimme);
-        sisestatuduuringud.getItems().add(rinna);
-        sisestatuduuringud.getItems().add(pea);
-
-        rullitav1.setContent(sisestatuduuringud);
+        rullitav1.setContent(sisestatuduuringudtabel);
         neljas.setBottom(rullitav1);
 
         juur.getChildren().add(neljas);
@@ -170,97 +173,114 @@ public class TehnikuGUI extends Application {
 
         viies.setTop(päis2);
 
-        TableView valimitestaatustabel = new TableView();
+        TableView<Valim> valimitestaatustabel = new TableView<Valim>();
         valimitestaatustabel.setPrefHeight(100);
         valimitestaatustabel.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         TableColumn<Valim, String> veerg4 = new TableColumn<>("Uuringu nimetus");
         veerg4.setCellValueFactory(new PropertyValueFactory<>("uuringunimetus"));
+        valimitestaatustabel.getColumns().add(veerg4);
 
         TableColumn<Valim, Integer> veerg5 = new TableColumn<>("Valimis");
         veerg5.setCellValueFactory(new PropertyValueFactory<>("suurus"));
+        valimitestaatustabel.getColumns().add(veerg5);
 
         TableColumn<Valim, Integer> veerg6 = new TableColumn<>("Ootel");
         veerg6.setCellValueFactory(new PropertyValueFactory<>("ootel"));
+        valimitestaatustabel.getColumns().add(veerg6);
 
         TableColumn<Valim, Double> veerg7 = new TableColumn<>("Kesk. kaal");
         veerg7.setCellValueFactory(new PropertyValueFactory<>("keskKaal"));
+        valimitestaatustabel.getColumns().add(veerg7);
 
         TableColumn<Valim, String> veerg8 = new TableColumn<>("Olek");
         veerg8.setCellValueFactory(new PropertyValueFactory<>("staatus"));
+        valimitestaatustabel.getColumns().add(veerg8);
 
-        valimitestaatustabel.getColumns().addAll(veerg4, veerg5, veerg6,veerg7,veerg8);
-
-        valimitestaatustabel.getItems().add(new Valim(sl.getDb().getAllUuringud(NimmelülidUuring.class)));
-        valimitestaatustabel.getItems().add(new Valim(sl.getDb().getAllUuringud(RindkereUuring.class)));
-        valimitestaatustabel.getItems().add(new Valim(sl.getDb().getAllUuringud(PeaNatiivUuring.class)));
+        valimitestaatustabel.setItems(valimidstaatuslist);
 
         viies.setBottom(valimitestaatustabel);
 
         juur.getChildren().add(viies);
 
         /**
-         * Nupulevajutuse käsitleja
+         * "Lisa" nupule vajutuse käsitleja
          */
-        lisa.setOnMouseClicked(me -> {
-            String valik = uuringunimetused.getSelectionModel().selectedItemProperty().getValue();
-            String accnrväljund = accnrsisestus.getText();
-            double kaalväljund = Double.parseDouble(kaalsisestus.getText());
-            Class<? extends Uuring> klass = uuringutüübid.get(valik);
-            Class[] cArg = new Class[2];
-            cArg[0] = String.class;
-            cArg[1] = double.class;
-            Object[] iArg = new Object[2];
-            iArg[0] = accnrväljund;
-            iArg[1] = kaalväljund;
-            Constructor constructor = null;
-            try {
-                constructor = klass.getDeclaredConstructor(cArg);
-                constructor.newInstance(iArg);
-                System.out.println("Tegi ära");
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace(); //tuleb teha midagi
+        lisanupp.setOnMouseClicked(me -> {
+            String uuringuvalik = uuringunimetusedvalik.getSelectionModel().selectedItemProperty().getValue();
+            String viitväljund = viitsisestus.getText();
+            prefs.put("viimaneacc", viitväljund);
+            double kaalväljund;
+            if (uuringuvalik != null) {
+                Class<? extends Uuring> klass = konfiguratsioonid.getNimedklassidmap().get(uuringuvalik);
+                try {
+                    kaalväljund = Double.parseDouble(kaalsisestus.getText().replace(",","."));
+                    süsteemiliides.UusUuring(viitväljund, kaalväljund, klass);
+                    kontrolliSisestus(süsteemiliides.getDb().getUuring(viitväljund));
+                    uuendaTabelid();
+                    viitsisestus.setText("HTYK");
+                    kaalsisestus.setText("0.0");
+                    uuringunimetusedvalik.setValue("");
+                    teade.setTextFill(Color.GREEN);
+                    teade.setText("Uuring \"" + viitväljund + "\" lisatud!");
+                } catch (NumberFormatException e) {
+                    teade.setTextFill(Color.RED);
+                    teade.setText("Kaal \"" + kaalsisestus.getText() + "\" on vale vormistusega!");
+                } catch (EntityExistsException e) {
+                    teade.setTextFill(Color.RED);
+                    teade.setText("Uuring \"" + viitväljund + "\" on juba andmebaasis!");
+                } catch (SisestusVormiException e) {
+                    teade.setTextFill(Color.RED);
+                    teade.setText("Uuringut ei õnnestunud lisada: " + e.getMessage());
+                    süsteemiliides.getDb().removeUuring(süsteemiliides.getDb().getUuring(viitväljund));
+                } catch (Exception e) {
+                    teade.setTextFill(Color.RED);
+                    teade.setText("Uuringut ei õnnestunud lisada!");
+                }
+            } else {
+                teade.setTextFill(Color.RED);
+                teade.setText("Uuringu nimetus peab olema valitud!");
             }
         });
 
+        /**
+         * "Värskenda" nupule vajutuse käsitleja
+         */
+        värskenda.setOnMouseClicked(me -> {
+            valimiteUuendus(valimidstaatuslist, süsteemiliides);
+        });
 
-//        /**
-//         * Teine paan seadme nimetusega
-//         */
-//        BorderPane keskmine = new BorderPane();
-//        keskmine.setPadding(new Insets(10, 0, 0, 0));
-//
-//        Label eur = new Label("EUR");
-//        eur.setFont(new Font(15));
-//        eur.setPadding(new Insets(5, 0, 0, 5));
-//        keskmine.setLeft(eur);
-//
-//        HBox hBox = new HBox();
-//        hBox.setPrefWidth(140);
-//        ObservableList<String> options = FXCollections.observableArrayList(kursid.keySet());
-//        ComboBox<String> valuutad = new ComboBox<>(options);
-//        valuutad.getSelectionModel().selectFirst();
-//        hBox.getChildren().add(valuutad);
-//        keskmine.setRight(hBox);
-//
-//        juur.getChildren().add(keskmine);
-//
-//        /**
-//         * Alumine paan kahe tekstiväljaga
-//         */
-//        BorderPane alumine = new BorderPane();
-//        alumine.setPadding(new Insets(5, 2, 5, 2));
-//
-//        TextField eurod = new TextField("0");
-//        eurod.setPrefWidth(140);
-//        alumine.setLeft(eurod);
-//
-//        TextField valuuta = new TextField("0");
-//        valuuta.setPrefWidth(140);
-//        valuuta.setEditable(false);
-//        alumine.setRight(valuuta);
-//
-//        juur.getChildren().add(alumine);
+        /**
+         * "Kustuta" nupule vajutuse käsitleja
+         */
+        kustutanupp.setOnMouseClicked(me -> {
+            Uuring uuring = sisestatuduuringudtabel.getSelectionModel().getSelectedItem();
+            if (uuring != null) {
+                süsteemiliides.getDb().removeUuring(uuring);
+                uuringuteUuendus(viimaseduuringudlist, süsteemiliides);
+                valimiteUuendus(valimidstaatuslist, süsteemiliides);
+                teade.setTextFill(Color.GREEN);
+                teade.setText("Uuring " + uuring.getViit() + " kustutatud!");
+            }
+        });
+
+        /**
+         * "Seaded" nupule vajutuse käsitleja
+         */
+        seaded.setOnMouseClicked(me -> {
+            peaLava.hide();
+            Stage seadedaken = new Stage();
+            seadedaken.setTitle("Seaded");
+            SeadedGUI seadedGUI = new SeadedGUI();
+            seadedGUI.run();
+            Scene stseen2 = new Scene(seadedGUI, 320, 150, Color.AZURE);
+            seadedaken.setScene(stseen2);
+            seadedaken.setResizable(false);
+            seadedaken.showAndWait();
+            prefs = Preferences.userNodeForPackage(SeadedGUI.class);
+            uuendaOlek();
+            peaLava.show();
+        });
 
         /**
          * Stseen ja show
@@ -270,5 +290,78 @@ public class TehnikuGUI extends Application {
         peaLava.setTitle("Dooside kogumise rakendus");
         peaLava.setResizable(false);
         peaLava.show();
+    }
+
+    private ObservableList<Valim> valimiteUuendus(ObservableList<Valim> valimid, Süsteemiliides sl) {
+        if (valimid.size() != 0)
+            valimid.removeAll(valimid);
+        for (Map.Entry<String, Class<? extends Uuring>> klass : konfiguratsioonid.getNimedklassidmap().entrySet()) {
+            Class klassivalik = klass.getValue();
+            Kriteerium kriteerium = konfiguratsioonid.getKlassidkriteeriumidmap().get(klassivalik);
+            try {
+                Valim valim = new ValimiSelekteerija(klassivalik, sl.getEmf(), kriteerium).getValim();
+                List<Uuring> uuringud = valim.getUuringud();
+                valim.setUuringunimetus(konfiguratsioonid.getKlassidnimedmap().get(klassivalik));
+                valim.setOotel(uuringud.size() - (int) uuringud.stream().filter(Uuring::isAndmedlaetud).count());
+                valim.setStaatus("Valim on koos");
+                valimid.add(valim);
+            } catch (TühiUuringulistException e) {
+                // ei tee midagi
+            } catch (PuudulikValimException e) {
+                Valim valim = e.getValim();
+                List<Uuring> uuringud = valim.getUuringud();
+                valim.setUuringunimetus(konfiguratsioonid.getKlassidnimedmap().get(klassivalik));
+                valim.setOotel(uuringud.size() - (int) uuringud.stream().filter(Uuring::isAndmedlaetud).count());
+                if (e.getMessage().equals("SOBIMATU_KAALUKESKMINE")) {
+                    if (valim.getKeskKaal() < kriteerium.getKeskKaal())
+                        valim.setStaatus("Keskmine kaal on madal");
+                    else
+                        valim.setStaatus("Keskmine kaal on kõrge");
+                }
+                if (e.getMessage().equals("UURINGUTE_MIINIMUM_TÄITMATA"))
+                    valim.setStaatus("Miinimum täitmata");
+                valimid.add(valim);
+            }
+        }
+        return valimid;
+    }
+
+    private ObservableList<Uuring> uuringuteUuendus(ObservableList<Uuring> viimatisisestatud, Süsteemiliides sl) {
+        if (viimatisisestatud.size() != 0)
+            viimatisisestatud.removeAll(viimatisisestatud);
+        try {
+            viimatisisestatud.addAll(sl.getDb().getViimasedUuringud(3));
+        } catch (TühiUuringulistException e) {
+            // ei tee midagi
+        }
+        return viimatisisestatud;
+    }
+
+    private void kontrolliSisestus(Uuring uuring) throws SisestusVormiException {
+        String viit = uuring.getViit();
+        Class klass = uuring.getClass();
+        Kriteerium kriteerium = konfiguratsioonid.getKlassidkriteeriumidmap().get(klass);
+        int pikkusekriteerium = 16;
+        double minkaal = kriteerium.getMinKaal();
+        double maxkaal = kriteerium.getMaxKaal();
+        double kaal = uuring.getKaal();
+
+        if (viit.length() >= 16)
+            throw new SisestusVormiException("Accession nr " + viit + " ei ole õige pikkusega (" + pikkusekriteerium+ " tähemärki)");
+        if (kaal < minkaal || kaal > maxkaal)
+            throw new SisestusVormiException("Sisestatud kaal " + kaal + " ei ole lubatud vahemikus (" + minkaal + " kuni " + maxkaal + " kg)");
+    }
+
+    private void uuendaOlek() {
+        konfiguratsioonid = new Konfiguratsioonid(prefs.get(modaliteetpref,"RG"));
+        uuringuvaliklist = FXCollections.observableArrayList(konfiguratsioonid.getNimedklassidmap().keySet());
+        uuringunimetusedvalik.setItems(uuringuvaliklist);
+        seadmenimetussilt.setText("Seadme nimetus: " + prefs.get(seadmenimipref,"default"));
+        uuendaTabelid();
+    }
+
+    private void uuendaTabelid(){
+        valimiteUuendus(valimidstaatuslist, süsteemiliides);
+        uuringuteUuendus(viimaseduuringudlist, süsteemiliides);
     }
 }
