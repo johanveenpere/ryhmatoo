@@ -4,7 +4,6 @@ import Repository.UuringRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,8 +37,8 @@ public class ValimiSelekteerija <T extends Uuring> {
     public Valim getValim() throws PuudulikValimException {
         EntityManager em = emf.createEntityManager();
         try {
-            UuringRepository repo = new UuringRepository(this.emf,em);
-            Valim sorteerimataValim = new Valim(kriteerium, uuringType, repo.getValimiKandidaadid(uuringType, kriteerium));
+            UuringRepository repo = new UuringRepository(em);
+            Valim sorteerimataValim = new Valim(kriteerium, uuringType, repo.getByKriteerium(uuringType, kriteerium));
 
             if (!sorteerimataValim.isMiinimumTäidetud()) {
                 throw new PuudulikValimException(UURINGUTE_MIINIMUM_TÄITMATA, sorteerimataValim);

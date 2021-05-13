@@ -1,11 +1,15 @@
+import Model.RindkereUuring;
 import Model.Uuring;
 import Repository.UuringRepository;
+import Service.Kriteerium;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
+import java.time.LocalDate;
 import java.util.List;
 
 public class RepositoryTest {
@@ -17,7 +21,7 @@ public class RepositoryTest {
     public static void setup() {
         emf = Persistence.createEntityManagerFactory("default");
         em = emf.createEntityManager();
-        repo = new UuringRepository(emf, em);
+        repo = new UuringRepository(em);
     }
 
     @AfterAll
@@ -45,11 +49,22 @@ public class RepositoryTest {
     }
 
     @Test
-    public void uuringuidSaabEemaldada() {
+    public void uuringuidSaabEemaldadaObjektiJärgi() {
         List<Uuring> uuringud = DummyData.randomUuringud();
         for (Uuring uuring : uuringud) {
             repo.addUuring(uuring);
             repo.removeUuring(uuring);
+        }
+        List<Uuring> inDB = em.createQuery("SELECT c FROM Uuring AS c", Uuring.class).getResultList();
+        Assertions.assertEquals(0,inDB.size());
+    }
+
+    @Test
+    public void uuringuidSaabEemaldadaViidaJärgi() {
+        List<Uuring> uuringud = DummyData.randomUuringud();
+        for (Uuring uuring : uuringud) {
+            repo.addUuring(uuring);
+            repo.removeUuring(uuring.getViit());
         }
         List<Uuring> inDB = em.createQuery("SELECT c FROM Uuring AS c", Uuring.class).getResultList();
         Assertions.assertEquals(0,inDB.size());
@@ -95,5 +110,55 @@ public class RepositoryTest {
         repo.deleteAll();
         int sizeAfter = em.createQuery("SELECT c FROM Uuring AS c", Uuring.class).getResultList().size();
         Assertions.assertEquals(0, sizeAfter);
+    }
+
+    @Test void päribMinimaalseKriteeriumiJärgi() {
+        for (int i = 0; i < 10; i++) {
+            for (Uuring uuring : DummyData.randomUuringud()) {
+                repo.addUuring(uuring);
+            }
+        }
+        List<Uuring> uuringud = repo.getByKriteerium(RindkereUuring.class, new Kriteerium(10,60,5));
+        Assertions.assertEquals(10,uuringud.size());
+    }
+
+    @Test
+    public void päribTäitmiseJärgi() {
+        for (int i = 0; i < 10; i++) {
+            for (Uuring uuring : DummyData.randomUuringud()) {
+                if (i % 2 == 0) {
+                    uuring.setTäidetud(true);
+                }
+                repo.addUuring(uuring);
+            }
+        }
+        Kriteerium kriteerium = new Kriteerium(10,60,5);
+        kriteerium.setTäitmataUuringud(false);
+        List<Uuring> uuringud = repo.getByKriteerium(RindkereUuring.class, kriteerium);
+        Assertions.assertEquals(5,uuringud.size());
+    }
+
+    @Test
+    public void päribKuupäevaJärgi() {
+        for (int i = 0; i < 10; i++) {
+            for (Uuring uuring : DummyData.randomUuringud()) {
+                repo.addUuring(uuring);
+                if (i % 2 == 0) {
+                    uuring.setLoomisaeg(LocalDate.of(2018,10,10));
+                }
+            }
+        }
+        List<Uuring> koikRindkereUuringudEnne2018 = repo.getByKriteerium(RindkereUuring.class, new Kriteerium(200,0,0,0,0,LocalDate.of(2017,5,12)));
+        List<Uuring> koikRindkereUuringudPeale2018 = repo.getByKriteerium(RindkereUuring.class, new Kriteerium(200,0,0,0,0,LocalDate.of(2019,5,12)));
+        Assertions.assertEquals(10, koikRindkereUuringudEnne2018.size());
+        Assertions.assertEquals(5, koikRindkereUuringudPeale2018.size());
+        System.out.println("=".repeat(10) + " Enne 2018 " + "=".repeat(10));
+        for (Uuring uuring : koikRindkereUuringudEnne2018) {
+            System.out.println(uuring.toString());
+        }
+        System.out.println("=".repeat(10) + " Pärast 2018 " + "=".repeat(10));
+        for (Uuring uuring : koikRindkereUuringudPeale2018) {
+            System.out.println(uuring.toString());
+        }
     }
 }
