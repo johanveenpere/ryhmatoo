@@ -1,11 +1,11 @@
 package Model;
 
-import Service.Kriteerium;
+import Service.Konfiguratsioonid;
 import com.pixelmed.dicom.AttributeTag;
 import com.pixelmed.dicom.TagFromName;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,13 +24,9 @@ public abstract class Uuring implements Comparable<Uuring> {
     @Column
     private String seade;
     @Column
-    private LocalDate kuupäev;
+    private LocalDateTime loomiseaeg;
     @Column
     private boolean andmedlaetud;
-    @Transient
-    private String uuringunimetus;
-    @Transient
-    private Kriteerium kriteerium;
 
     public Uuring() {
     }
@@ -43,6 +39,7 @@ public abstract class Uuring implements Comparable<Uuring> {
         this.viit = viit;
         this.kaal = kaal;
         this.andmedlaetud = false;
+        this.loomiseaeg = LocalDateTime.now();
     }
 
     /**
@@ -78,24 +75,16 @@ public abstract class Uuring implements Comparable<Uuring> {
         this.seade = seade;
     }
 
-    public void setKuupäev(LocalDate kuupäev) {
-        this.kuupäev = kuupäev;
+    public void setLoomiseaeg(LocalDateTime kuupäev) {
+        this.loomiseaeg = kuupäev;
     }
 
     public String getSeade() {
         return seade;
     }
 
-    public LocalDate getKuupäev() {
-        return kuupäev;
-    }
-
-    public void setUuringunimetus(String uuringunimetus) {
-        this.uuringunimetus = uuringunimetus;
-    }
-
-    public String getUuringunimetus() {
-        return uuringunimetus;
+    public LocalDateTime getLoomiseaeg() {
+        return loomiseaeg;
     }
 
     public void setAndmedlaetud(boolean andmedlaetud) {
@@ -106,12 +95,9 @@ public abstract class Uuring implements Comparable<Uuring> {
         return andmedlaetud;
     }
 
-    public void setKriteerium(Kriteerium kriteerium) {
-        this.kriteerium = kriteerium;
-    }
-
-    public Kriteerium getKriteerium() {
-        return kriteerium;
+    public String getUuringunimetus(){
+        Konfiguratsioonid konfiguratsioonid = new Konfiguratsioonid();
+        return konfiguratsioonid.getKlassidnimedmap().get(this.getClass());
     }
 
     public Map<String, AttributeTag> getPõhiAtribuudid() {
@@ -133,7 +119,7 @@ public abstract class Uuring implements Comparable<Uuring> {
                 ", kaal=" + kaal +
                 ", sugu='" + sugu + '\'' +
                 ", vanus=" + vanus +
-                ", kuupäev=" + kuupäev +
+                ", kuupäev=" + loomiseaeg +
                 '}';
     }
 
@@ -142,7 +128,7 @@ public abstract class Uuring implements Comparable<Uuring> {
                 ", kaal=" + kaal +
                 ", sugu='" + sugu + '\'' +
                 ", vanus=" + vanus +
-                ", kuupäev=" + kuupäev;
+                ", kuupäev=" + loomiseaeg;
     }
 
     public String toCSVStringVäljadeNimed() {
@@ -155,7 +141,7 @@ public abstract class Uuring implements Comparable<Uuring> {
     }
 
     public String toCSVString() {
-        return this.kuupäev + ", "
+        return this.loomiseaeg + ", "
                 + this.seade + ", "
                 + this.viit + ", "
                 + this.kaal + ", "
@@ -165,7 +151,9 @@ public abstract class Uuring implements Comparable<Uuring> {
 
     @Override
     public int compareTo(Uuring o) {
-        return Double.compare(this.kaal, o.kaal);
+        return o.getLoomiseaeg().compareTo(loomiseaeg);
     }
+
+
 
 }

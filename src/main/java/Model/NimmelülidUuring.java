@@ -27,8 +27,6 @@ public class NimmelülidUuring extends Uuring {
 
     public NimmelülidUuring(String viit, double kaal) {
         super(viit, kaal);
-        super.setUuringunimetus("Nimmelülid AP/LAT");
-        super.setKriteerium(new Kriteerium(85,65,75,0.2,10, LocalDate.of(2020,4,1)));
     }
 
     public NimmelülidUuring() {}

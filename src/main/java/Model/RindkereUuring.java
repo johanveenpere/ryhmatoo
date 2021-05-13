@@ -22,8 +22,6 @@ public class RindkereUuring extends Uuring {
 
     public RindkereUuring(String viit, double kaal) {
         super(viit, kaal);
-        super.setUuringunimetus("Rindkere PA");
-        super.setKriteerium(new Kriteerium(85,65,75,0.2,10, LocalDate.of(2020,4,1)));
     }
 
     @Override
@@ -49,6 +47,8 @@ public class RindkereUuring extends Uuring {
     public void setDistanceSourceToPatient(double distanceSourceToPatient) {
         this.distanceSourceToPatient = distanceSourceToPatient;
     }
+
+
 
     @Override
     public String toCSVStringVäljadeNimed() {
