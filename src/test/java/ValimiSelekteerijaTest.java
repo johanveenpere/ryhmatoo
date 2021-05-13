@@ -6,14 +6,12 @@ import Service.PuudulikValimException;
 import Service.Valim;
 import Service.ValimiSelekteerija;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
-import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,7 +24,7 @@ public class ValimiSelekteerijaTest {
     public static void setup() {
         emf = Persistence.createEntityManagerFactory("default");
         em = emf.createEntityManager();
-        repo = new UuringRepository(emf, em);
+        repo = new UuringRepository(em);
     }
 
     @AfterAll
@@ -51,8 +49,8 @@ public class ValimiSelekteerijaTest {
             for (Uuring uuring : uuringud) {
                 repo.addUuring(uuring);
             }
-            Kriteerium kriteerium1 = new Kriteerium(80, 20, 50, 0, 2, OffsetDateTime.now());
-            Kriteerium kriteerium2 = new Kriteerium(80,20,56.6,0.2,3,OffsetDateTime.now());
+            Kriteerium kriteerium1 = new Kriteerium(80, 20, 50, 0, 2);
+            Kriteerium kriteerium2 = new Kriteerium(80,20,56.6,0.2,3);
 
             ValimiSelekteerija<NimmelülidUuring> selekteerija1 = new ValimiSelekteerija<>(NimmelülidUuring.class, emf, kriteerium1);
             ValimiSelekteerija<NimmelülidUuring> selekteerija2 = new ValimiSelekteerija<>(NimmelülidUuring.class, emf, kriteerium2);
@@ -84,7 +82,7 @@ public class ValimiSelekteerijaTest {
             }
         }
         try {
-            Kriteerium kriteerium = new Kriteerium(80, 20, 65, 2, 20, OffsetDateTime.now());
+            Kriteerium kriteerium = new Kriteerium(80, 20, 65, 2, 20);
             ValimiSelekteerija<NimmelülidUuring> selekteerija = new ValimiSelekteerija<>(NimmelülidUuring.class, emf, kriteerium);
             System.out.println(selekteerija.getValim());
 
@@ -104,7 +102,26 @@ public class ValimiSelekteerijaTest {
             }
         }
         try {
-            Kriteerium kriteerium = new Kriteerium(80, 20, 65, 2, 10, OffsetDateTime.now());
+            Kriteerium kriteerium = new Kriteerium(80, 20, 65, 2, 10);
+            ValimiSelekteerija<NimmelülidUuring> selekteerija = new ValimiSelekteerija<>(NimmelülidUuring.class, emf, kriteerium);
+            System.out.println(selekteerija.getValim());
+        }
+        catch (PuudulikValimException e) {
+            System.out.println(e);
+            System.out.println(e.getValim().toString());
+        }
+    }
+
+    @RepeatedTest(5)
+    public void töötabMinimaalseKriteeriumiga() {
+        System.out.println(repo.getAllUuringud(Uuring.class).size());
+        for (int i = 0; i < 20; i++) {
+            for (Uuring uuring : DummyData.randomUuringud()) {
+                repo.addUuring(uuring);
+            }
+        }
+        try {
+            Kriteerium kriteerium = new Kriteerium(60,5,10);
             ValimiSelekteerija<NimmelülidUuring> selekteerija = new ValimiSelekteerija<>(NimmelülidUuring.class, emf, kriteerium);
             System.out.println(selekteerija.getValim());
         }
