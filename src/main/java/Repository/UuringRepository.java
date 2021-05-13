@@ -2,10 +2,9 @@ package Repository;
 
 import Model.Uuring;
 import Service.Kriteerium;
+import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
+import javax.persistence.*;
 import java.util.List;
 
 public class UuringRepository {
@@ -31,9 +30,21 @@ public class UuringRepository {
      * @param uuring Uuring objekt
      */
     public void addUuring(Uuring uuring) {
-        this.em.getTransaction().begin();
-        this.em.persist(uuring);
-        this.em.getTransaction().commit();
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+        try {
+            em.persist(uuring);
+            transaction.commit();
+        } catch (RollbackException e) {
+            transaction.rollback();
+            Throwable cause = e.getCause().getCause().getCause();
+            if (cause instanceof JdbcSQLIntegrityConstraintViolationException)
+                throw new EntityExistsException();
+            throw e;
+        } catch (Exception e) {
+            transaction.rollback();
+            throw e;
+        }
     }
 
     /**
@@ -65,7 +76,17 @@ public class UuringRepository {
      * @return List soovitud Uuringu objektidest
      */
     public <T extends Uuring> List<Uuring> getAllUuringud(Class<T> uuringType) {
-        return this.em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c", Uuring.class).getResultList();
+        List<Uuring> uuringud = this.em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c", Uuring.class).getResultList();
+        if (uuringud.size() == 0)
+            throw new TühiUuringulistException();
+        return uuringud;
+    }
+
+    public <T extends Uuring> List<Uuring> getViimasedUuringud(int uuringutearv) {
+        List<Uuring> uuringud = this.em.createQuery("SELECT u FROM Uuring u ORDER BY u.loomiseaeg DESC", Uuring.class).setMaxResults(uuringutearv).getResultList();
+        if (uuringud.size() == 0)
+            throw new TühiUuringulistException();
+        return uuringud;
     }
 
     /**
@@ -76,6 +97,9 @@ public class UuringRepository {
      * @return List soovitud Uuring objektidest mis vastavad min/max kaalu kriteeriumitele
      */
     public <T extends Uuring> List<Uuring> getValimiKandidaadid(Class<T> uuringType, Kriteerium kriteerium) {
-        return this.em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c WHERE c.kaal <= " + kriteerium.getMaxKaal() + " AND c.kaal >= " + kriteerium.getMinKaal(), Uuring.class).getResultList();
+        List<Uuring> uuringud = this.em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c WHERE c.kaal <= " + kriteerium.getMaxKaal() + " AND c.kaal >= " + kriteerium.getMinKaal(), Uuring.class).getResultList();
+        if (uuringud.size() == 0)
+            throw new TühiUuringulistException();
+        return uuringud;
     }
 }
