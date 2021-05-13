@@ -22,7 +22,7 @@ public class KokkuvõtteKoostajaTest {
 
         File testfail = new File(failinimi);
         assertTrue(testfail.exists());
-        //testfail.delete();
+        testfail.delete();
     }
 
     private List<Uuring> testUuringList() throws NoSuchMethodException, DicomException, IOException, IllegalAccessException, InvocationTargetException {

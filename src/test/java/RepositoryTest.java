@@ -1,6 +1,7 @@
 import Model.Uuring;
 import Repository.UuringRepository;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -17,7 +18,7 @@ public class RepositoryTest {
     public static void setup() {
         emf = Persistence.createEntityManagerFactory("default");
         em = emf.createEntityManager();
-        repo = new UuringRepository(emf, em);
+        repo = new UuringRepository(emf);
     }
 
     @AfterAll

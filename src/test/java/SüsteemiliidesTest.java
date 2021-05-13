@@ -22,7 +22,7 @@ class SüsteemiliidesTest {
     static void setUp(){
         emf = Persistence.createEntityManagerFactory("default");
         em = emf.createEntityManager();
-        db = new UuringRepository(emf, em);
+        db = new UuringRepository(emf);
         liides = new Süsteemiliides(db);
     }
 
