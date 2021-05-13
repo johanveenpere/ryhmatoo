@@ -23,7 +23,9 @@ public abstract class Uuring implements Comparable<Uuring> {
     @Column
     private String seade;
     @Column
-    private LocalDate kuupäev;
+    private LocalDate loomisaeg ;
+    @Column
+    private boolean täidetud = false;
 
     public Uuring() {
     }
@@ -35,12 +37,22 @@ public abstract class Uuring implements Comparable<Uuring> {
     protected Uuring(String viit, double kaal) {
         this.viit = viit;
         this.kaal = kaal;
+        this.loomisaeg = LocalDate.now();
     }
+
 
     /**
      * Getterid on kõigile isendiväljadele.
      * Setterid on vajalikud ainult väljadele, mida muudetakse. Viita ja kaalu ei ole vaja ja ei tohiks saadagi hiljem enam muuta (final).
      */
+
+    public boolean isTäidetud() {
+        return täidetud;
+    }
+
+    public void setTäidetud(boolean täidetud) {
+        this.täidetud = täidetud;
+    }
 
     public String getViit() {
         return viit;
@@ -70,16 +82,16 @@ public abstract class Uuring implements Comparable<Uuring> {
         this.seade = seade;
     }
 
-    public void setKuupäev(LocalDate kuupäev) {
-        this.kuupäev = kuupäev;
+    public void setLoomisaeg(LocalDate loomisaeg) {
+        this.loomisaeg = loomisaeg;
     }
 
     public String getSeade() {
         return seade;
     }
 
-    public LocalDate getKuupäev() {
-        return kuupäev;
+    public LocalDate getLoomisaeg() {
+        return loomisaeg;
     }
 
     public Map<String, AttributeTag> getPõhiAtribuudid() {
@@ -101,7 +113,7 @@ public abstract class Uuring implements Comparable<Uuring> {
                 ", kaal=" + kaal +
                 ", sugu='" + sugu + '\'' +
                 ", vanus=" + vanus +
-                ", kuupäev=" + kuupäev +
+                ", kuupäev=" + loomisaeg +
                 '}';
     }
 
@@ -110,7 +122,8 @@ public abstract class Uuring implements Comparable<Uuring> {
                 ", kaal=" + kaal +
                 ", sugu='" + sugu + '\'' +
                 ", vanus=" + vanus +
-                ", kuupäev=" + kuupäev;
+                ", kuupäev=" + loomisaeg +
+                ", täidetud=" + täidetud;
     }
 
     public String toCSVStringVäljadeNimed() {
@@ -123,7 +136,7 @@ public abstract class Uuring implements Comparable<Uuring> {
     }
 
     public String toCSVString() {
-        return this.kuupäev + ", "
+        return this.loomisaeg + ", "
                 + this.seade + ", "
                 + this.viit + ", "
                 + this.kaal + ", "
