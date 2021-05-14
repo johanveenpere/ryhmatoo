@@ -26,7 +26,7 @@ public abstract class Uuring implements Comparable<Uuring> {
     @Column
     private LocalDateTime loomiseaeg;
     @Column
-    private boolean andmedlaetud;
+    private boolean täidetud = false;
 
     public Uuring() {
     }
@@ -38,7 +38,6 @@ public abstract class Uuring implements Comparable<Uuring> {
     protected Uuring(String viit, double kaal) {
         this.viit = viit;
         this.kaal = kaal;
-        this.andmedlaetud = false;
         this.loomiseaeg = LocalDateTime.now();
     }
 
@@ -46,6 +45,14 @@ public abstract class Uuring implements Comparable<Uuring> {
      * Getterid on kõigile isendiväljadele.
      * Setterid on vajalikud ainult väljadele, mida muudetakse. Viita ja kaalu ei ole vaja ja ei tohiks saadagi hiljem enam muuta (final).
      */
+
+    public boolean isTäidetud() {
+        return täidetud;
+    }
+
+    public void setTäidetud(boolean täidetud) {
+        this.täidetud = täidetud;
+    }
 
     public String getViit() {
         return viit;
@@ -85,15 +92,6 @@ public abstract class Uuring implements Comparable<Uuring> {
 
     public LocalDateTime getLoomiseaeg() {
         return loomiseaeg;
-    }
-
-    public void setAndmedlaetud(boolean andmedlaetud) {
-        this.andmedlaetud = andmedlaetud;
-    }
-
-    public boolean isAndmedlaetud() {
-        return andmedlaetud;
-    }
 
     public String getUuringunimetus(){
         Konfiguratsioonid konfiguratsioonid = new Konfiguratsioonid();
@@ -119,7 +117,7 @@ public abstract class Uuring implements Comparable<Uuring> {
                 ", kaal=" + kaal +
                 ", sugu='" + sugu + '\'' +
                 ", vanus=" + vanus +
-                ", kuupäev=" + loomiseaeg +
+                ", loomiseaeg=" + loomiseaeg +
                 '}';
     }
 
@@ -128,7 +126,8 @@ public abstract class Uuring implements Comparable<Uuring> {
                 ", kaal=" + kaal +
                 ", sugu='" + sugu + '\'' +
                 ", vanus=" + vanus +
-                ", kuupäev=" + loomiseaeg;
+                ", loomiseaeg=" + loomiseaeg +
+                ", täidetud=" + täidetud;
     }
 
     public String toCSVStringVäljadeNimed() {
@@ -153,7 +152,5 @@ public abstract class Uuring implements Comparable<Uuring> {
     public int compareTo(Uuring o) {
         return o.getLoomiseaeg().compareTo(loomiseaeg);
     }
-
-
 
 }

@@ -4,7 +4,15 @@ import Model.Uuring;
 import Service.Kriteerium;
 import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
+import javax.persistence.EntityExistsException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import java.lang.reflect.Type;
+import java.sql.Date;
 import java.util.List;
 
 public class UuringRepository {
@@ -63,6 +71,12 @@ public class UuringRepository {
         this.em.getTransaction().commit();
     }
 
+    public void removeUuring(String viit) {
+        this.em.getTransaction().begin();
+        this.em.remove(getUuring(viit));
+        this.em.getTransaction().commit();
+    }
+
     public void deleteAll() {
         this.em.getTransaction().begin();
         this.em.createQuery("DELETE from Uuring").executeUpdate();
@@ -96,8 +110,9 @@ public class UuringRepository {
      * @param <T> Uuring tüüpi klass
      * @return List soovitud Uuring objektidest mis vastavad min/max kaalu kriteeriumitele
      */
-    public <T extends Uuring> List<Uuring> getValimiKandidaadid(Class<T> uuringType, Kriteerium kriteerium) {
-        List<Uuring> uuringud = this.em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c WHERE c.kaal <= " + kriteerium.getMaxKaal() + " AND c.kaal >= " + kriteerium.getMinKaal(), Uuring.class).getResultList();
+    public <T extends Uuring> List<Uuring> getByKriteerium(Class<T> uuringType, Kriteerium kriteerium) {
+            List<Uuring> uuringud = em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c WHERE  c.kaal >= :minkaal", Uuring.class).setParameter("minkaal",kriteerium.getMinKaal()).getResultList();
+            uuringud.removeIf(uuring -> !kriteerium.uuringVastabKriteeriumile(uuring));
         if (uuringud.size() == 0)
             throw new TühiUuringulistException();
         return uuringud;
