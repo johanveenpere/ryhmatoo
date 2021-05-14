@@ -3,10 +3,7 @@ package Repository;
 import Model.Uuring;
 import Service.Kriteerium;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import java.lang.reflect.Type;
 import java.sql.Date;
 import java.util.List;
@@ -32,9 +29,14 @@ public class UuringRepository {
      * @param uuring Uuring objekt
      */
     public void addUuring(Uuring uuring) {
-        this.em.getTransaction().begin();
-        this.em.persist(uuring);
-        this.em.getTransaction().commit();
+        if (this.em.find(Uuring.class,uuring.getViit()) == null) {
+            this.em.getTransaction().begin();
+            this.em.persist(uuring);
+            this.em.getTransaction().commit();
+        }
+        else {
+            throw new EntityExistsException();
+        }
     }
 
     /**
@@ -73,6 +75,10 @@ public class UuringRepository {
      */
     public <T extends Uuring> List<Uuring> getAllUuringud(Class<T> uuringType) {
        return this.em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c", Uuring.class).getResultList();
+    }
+
+    public List<Uuring> getAllTäitmataUuringud() {
+        return this.em.createQuery("SELECT c FROM Uuring AS c WHERE c.täidetud = false", Uuring.class).getResultList();
     }
 
     /**
