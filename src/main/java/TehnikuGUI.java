@@ -301,7 +301,7 @@ public class TehnikuGUI extends Application {
                 Valim valim = new ValimiSelekteerija(klassivalik, sl.getEmf(), kriteerium).getValim();
                 List<Uuring> uuringud = valim.getUuringud();
                 valim.setUuringunimetus(konfiguratsioonid.getKlassidnimedmap().get(klassivalik));
-                valim.setOotel(uuringud.size() - (int) uuringud.stream().filter(Uuring::isAndmedlaetud).count());
+                valim.setOotel(uuringud.size() - (int) uuringud.stream().filter(Uuring::isTäidetud).count());
                 valim.setStaatus("Valim on koos");
                 valimid.add(valim);
             } catch (TühiUuringulistException e) {
@@ -310,7 +310,7 @@ public class TehnikuGUI extends Application {
                 Valim valim = e.getValim();
                 List<Uuring> uuringud = valim.getUuringud();
                 valim.setUuringunimetus(konfiguratsioonid.getKlassidnimedmap().get(klassivalik));
-                valim.setOotel(uuringud.size() - (int) uuringud.stream().filter(Uuring::isAndmedlaetud).count());
+                valim.setOotel(uuringud.size() - (int) uuringud.stream().filter(Uuring::isTäidetud).count());
                 if (e.getMessage().equals("SOBIMATU_KAALUKESKMINE")) {
                     if (valim.getKeskKaal() < kriteerium.getKeskKaal())
                         valim.setStaatus("Keskmine kaal on madal");

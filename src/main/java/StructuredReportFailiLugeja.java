@@ -36,7 +36,6 @@ public class StructuredReportFailiLugeja {
         JsonArray jsonArray = new JSONRepresentationOfStructuredReportObjectFactory().getDocument(fail);
         JsonParser jsonParser = Json.createParser(new StringReader(jsonArray.get(0).toString()));
 
-        uuring.setLoomisaeg(LocalDateTime.parse(loeJsonString(jsonParser, "StudyDate"), DateTimeFormatter.BASIC_ISO_DATE));
         uuring.setSeade(loeJsonString(jsonParser, "StationName"));
         uuring.setSugu(loeJsonString(jsonParser, "PatientSex"));
         uuring.setVanus(Integer.parseInt(loeJsonString(jsonParser, "PatientAge").substring(0, 3)));

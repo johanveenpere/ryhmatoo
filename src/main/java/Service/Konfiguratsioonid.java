@@ -24,7 +24,7 @@ public class Konfiguratsioonid {
                 klassidnimedmap.put(PeaNatiivUuring.class, "Pea KT natiiv");
 
                 klassidkriteeriumidmap = new HashMap<>();
-                klassidkriteeriumidmap.put(PeaNatiivUuring.class, new Kriteerium(200, 30, 75, 100, 10, LocalDate.parse("2020-04-01")));
+                klassidkriteeriumidmap.put(PeaNatiivUuring.class, new Kriteerium(200, 30, 75, 100, 10));
             }
             case "RG" -> {
                 nimedklassidmap = new HashMap<>();
@@ -36,8 +36,8 @@ public class Konfiguratsioonid {
                 klassidnimedmap.put(NimmelülidUuring.class, "Nimmelülid AP/LAT");
 
                 klassidkriteeriumidmap = new HashMap<>();
-                klassidkriteeriumidmap.put(RindkereUuring.class, new Kriteerium(85, 65, 75, 3, 10, LocalDate.parse("2020-04-01")));
-                klassidkriteeriumidmap.put(NimmelülidUuring.class, new Kriteerium(85, 65, 75, 3, 10, LocalDate.parse("2020-04-01")));
+                klassidkriteeriumidmap.put(RindkereUuring.class, new Kriteerium(85, 65, 75, 3, 10));
+                klassidkriteeriumidmap.put(NimmelülidUuring.class, new Kriteerium(85, 65, 75, 3, 10));
             }
         }
     }
@@ -54,9 +54,9 @@ public class Konfiguratsioonid {
         klassidnimedmap.put(PeaNatiivUuring.class, "Pea KT natiiv");
 
         klassidkriteeriumidmap = new HashMap<>();
-        klassidkriteeriumidmap.put(RindkereUuring.class, new Kriteerium(85, 65, 75, 3, 10, LocalDate.parse("2020-04-01")));
-        klassidkriteeriumidmap.put(NimmelülidUuring.class, new Kriteerium(85, 65, 75, 3, 10, LocalDate.parse("2020-04-01")));
-        klassidkriteeriumidmap.put(PeaNatiivUuring.class, new Kriteerium(200, 30, 75, 100, 10, LocalDate.parse("2020-04-01")));
+        klassidkriteeriumidmap.put(RindkereUuring.class, new Kriteerium(85, 65, 75, 3, 10));
+        klassidkriteeriumidmap.put(NimmelülidUuring.class, new Kriteerium(85, 65, 75, 3, 10));
+        klassidkriteeriumidmap.put(PeaNatiivUuring.class, new Kriteerium(200, 30, 75, 100, 10));
     }
 
     public Map<String, Class<? extends Uuring>> getNimedklassidmap() {

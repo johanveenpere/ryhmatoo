@@ -89,7 +89,7 @@ public class Kriteerium {
         boolean vastabMinKaaluKriteeriumile = uuring.getKaal() >= this.minKaal;
         boolean vastabMaxKaaluKriteeriumile = uuring.getKaal() <= this.maxKaal || this.maxKaal == 0;
         boolean vastabTäidetudKriteeriumile = (this.täidetudUuringud && this.täitmataUuringud) || (this.täidetudUuringud && uuring.isTäidetud()) || (this.täitmataUuringud && !uuring.isTäidetud());
-        boolean vastabAlgusKuupäevaKriteeriumile = this.algusaeg == null || this.algusaeg.isBefore(uuring.getLoomisaeg());
+        boolean vastabAlgusKuupäevaKriteeriumile = this.algusaeg == null || this.algusaeg.isBefore(uuring.getLoomiseaeg());
         return vastabMinKaaluKriteeriumile && vastabMaxKaaluKriteeriumile && vastabTäidetudKriteeriumile && vastabAlgusKuupäevaKriteeriumile;
     }
 

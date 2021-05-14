@@ -6,6 +6,8 @@ import com.pixelmed.dicom.TagFromName;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +25,7 @@ public abstract class Uuring implements Comparable<Uuring> {
     private int vanus;
     @Column
     private String seade;
-    @Column
+    @Column(columnDefinition = "DATETIME(0)")
     private LocalDateTime loomiseaeg;
     @Column
     private boolean täidetud = false;
@@ -38,7 +40,7 @@ public abstract class Uuring implements Comparable<Uuring> {
     protected Uuring(String viit, double kaal) {
         this.viit = viit;
         this.kaal = kaal;
-        this.loomiseaeg = LocalDateTime.now();
+        this.loomiseaeg = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
     /**
@@ -92,8 +94,9 @@ public abstract class Uuring implements Comparable<Uuring> {
 
     public LocalDateTime getLoomiseaeg() {
         return loomiseaeg;
+    }
 
-    public String getUuringunimetus(){
+    public String getUuringunimetus() {
         Konfiguratsioonid konfiguratsioonid = new Konfiguratsioonid();
         return konfiguratsioonid.getKlassidnimedmap().get(this.getClass());
     }

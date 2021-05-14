@@ -17,12 +17,10 @@ import java.util.List;
 public class Süsteemiliides {
 
     private EntityManagerFactory emf;
-    private EntityManager em;
     private UuringRepository db;
 
     public Süsteemiliides(String andmebaasiNimi) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory(andmebaasiNimi);
-        em = emf.createEntityManager();
+        emf = Persistence.createEntityManagerFactory(andmebaasiNimi);
         db = new UuringRepository(emf);
     }
 
@@ -65,7 +63,7 @@ public class Süsteemiliides {
     }
 
     public void teeKokkuvõte(String failitee, Class<? extends Uuring> tüüp, Kriteerium kriteerium) {
-        List<Uuring> uuringud = db.getValimiKandidaadid(tüüp, kriteerium);
+        List<Uuring> uuringud = db.getByKriteerium(tüüp, kriteerium);
         try {
             KokkuvõtteKoostaja.teeCSV(uuringud, failitee);
         } catch (IOException e) {
