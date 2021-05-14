@@ -270,9 +270,9 @@ public class TehnikuGUI extends Application {
             peaLava.hide();
             Stage seadedaken = new Stage();
             seadedaken.setTitle("Seaded");
-            SeadedGUI seadedGUI = new SeadedGUI();
+            SeadedGUI seadedGUI = new SeadedGUI(süsteemiliides);
             seadedGUI.run();
-            Scene stseen2 = new Scene(seadedGUI, 320, 150, Color.AZURE);
+            Scene stseen2 = new Scene(seadedGUI, 320, 200, Color.AZURE);
             seadedaken.setScene(stseen2);
             seadedaken.setResizable(false);
             seadedaken.showAndWait();
@@ -295,31 +295,29 @@ public class TehnikuGUI extends Application {
         if (valimid.size() != 0)
             valimid.removeAll(valimid);
         for (Map.Entry<String, Class<? extends Uuring>> klass : konfiguratsioonid.getNimedklassidmap().entrySet()) {
-            Class klassivalik = klass.getValue();
-            Kriteerium kriteerium = konfiguratsioonid.getKlassidkriteeriumidmap().get(klassivalik);
             try {
-                Valim valim = new ValimiSelekteerija(klassivalik, sl.getEmf(), kriteerium).getValim();
-                List<Uuring> uuringud = valim.getUuringud();
+                Class klassivalik = klass.getValue();
+                Kriteerium kriteerium = konfiguratsioonid.getKlassidkriteeriumidmap().get(klassivalik);
+                Valim valim;
+                try {
+                    valim = new ValimiSelekteerija(klassivalik, sl.getEmf(), kriteerium).getValim();
+                    valim.setStaatus("Valim on koos");
+                } catch (PuudulikValimException e) {
+                    valim = e.getValim();
+                    if (e.getMessage().equals("SOBIMATU_KAALUKESKMINE")) {
+                        if (valim.getKeskKaal() < kriteerium.getKeskKaal())
+                            valim.setStaatus("Keskmine kaal on madal");
+                        else
+                            valim.setStaatus("Keskmine kaal on kõrge");
+                    }
+                    if (e.getMessage().equals("UURINGUTE_MIINIMUM_TÄITMATA"))
+                        valim.setStaatus("Miinimum täitmata");
+                }
                 valim.setUuringunimetus(konfiguratsioonid.getKlassidnimedmap().get(klassivalik));
-                valim.setOotel(uuringud.size() - (int) uuringud.stream().filter(Uuring::isTäidetud).count());
-                valim.setStaatus("Valim on koos");
+                valim.setOotel(sl.getDb().getAllTäitmataUuringud().size());
                 valimid.add(valim);
             } catch (TühiUuringulistException e) {
-                // ei tee midagi
-            } catch (PuudulikValimException e) {
-                Valim valim = e.getValim();
-                List<Uuring> uuringud = valim.getUuringud();
-                valim.setUuringunimetus(konfiguratsioonid.getKlassidnimedmap().get(klassivalik));
-                valim.setOotel(uuringud.size() - (int) uuringud.stream().filter(Uuring::isTäidetud).count());
-                if (e.getMessage().equals("SOBIMATU_KAALUKESKMINE")) {
-                    if (valim.getKeskKaal() < kriteerium.getKeskKaal())
-                        valim.setStaatus("Keskmine kaal on madal");
-                    else
-                        valim.setStaatus("Keskmine kaal on kõrge");
-                }
-                if (e.getMessage().equals("UURINGUTE_MIINIMUM_TÄITMATA"))
-                    valim.setStaatus("Miinimum täitmata");
-                valimid.add(valim);
+                //andmeid ei lisata valimite ülevaatesse
             }
         }
         return valimid;
@@ -331,7 +329,7 @@ public class TehnikuGUI extends Application {
         try {
             viimatisisestatud.addAll(sl.getDb().getViimasedUuringud(3));
         } catch (TühiUuringulistException e) {
-            // ei tee midagi
+            // kui andmebaasis pole uuringuid
         }
         return viimatisisestatud;
     }

@@ -62,10 +62,10 @@ public class Süsteemiliides {
         }
     }
 
-    public void teeKokkuvõte(String failitee, Class<? extends Uuring> tüüp, Kriteerium kriteerium) {
+    public void teeKokkuvõte(File fail, Class<? extends Uuring> tüüp, Kriteerium kriteerium) {
         List<Uuring> uuringud = db.getByKriteerium(tüüp, kriteerium);
         try {
-            KokkuvõtteKoostaja.teeCSV(uuringud, failitee);
+            KokkuvõtteKoostaja.teeCSV(uuringud, fail);
         } catch (IOException e) {
             e.printStackTrace();
         }

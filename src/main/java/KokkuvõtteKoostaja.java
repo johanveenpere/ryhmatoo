@@ -9,7 +9,7 @@ import java.util.*;
 
 public class KokkuvõtteKoostaja {
 
-    public static void teeCSV(List<Uuring> uuringud, String failinimi) throws IOException {
+    public static void teeCSV(List<Uuring> uuringud, File csvOutputFile) throws IOException {
 
         if (uuringud.size() == 0) {
             throw new TühiUuringulistException();
@@ -17,7 +17,6 @@ public class KokkuvõtteKoostaja {
 
         uuringud.sort(Comparator.comparing(u -> u.getClass().getName()));
 
-        File csvOutputFile = new File(failinimi);
         csvOutputFile.createNewFile();
 
         try (OutputStream os = new FileOutputStream(csvOutputFile);
