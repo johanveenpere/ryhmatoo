@@ -14,7 +14,9 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -172,16 +174,17 @@ public class SeadedGUI extends VBox implements Runnable {
                 File selectedDirectory = kaustavalija.showDialog(new Stage());
                 valitudpath = selectedDirectory.getAbsolutePath();
                 kaustasisestus.setText(valitudpath);
-            } catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 //kui kausta ei valita
             }
         });
 
         salvestakokkuvõtenupp.setOnMouseClicked(me -> {
-            if (isVäljadKorras())
+            if (isKaustVäliKorras() && isFailinimiVäliKorras()){
                 try {
-                    File csvOutputFile = new File(valitudpath + "\\" + failinimi);
-                    KokkuvõtteKoostaja.teeCSV(süsteemiliides.getDb().getAllUuringud(Uuring.class),csvOutputFile);
+                    Path path = Paths.get(valitudpath).toAbsolutePath();
+                    File csvOutputFile = new File(path.toString() + "\\" + failinimi);
+                    süsteemiliides.teeKokkuvõte(csvOutputFile, Uuring.class);
                     teade2.setTextFill(Color.GREEN);
                     teade2.setText("Salvestatud!");
                 } catch (TühiUuringulistException e) {
@@ -191,41 +194,51 @@ public class SeadedGUI extends VBox implements Runnable {
                     teade2.setTextFill(Color.RED);
                     teade2.setText("Ei õnnestunud salvestada!");
                 }
+            }
         });
 
         kaustasisestus.textProperty().addListener((observable, oldValue, newValue) -> {
             teade2.setText("");
             valitudpath = newValue;
+            isKaustVäliKorras();
         });
 
         failinimisisestus.textProperty().addListener((observable, oldValue, newValue) -> {
             teade2.setText("");
             failinimi = newValue;
-            if (failinimi.length() >= 5 && !failinimi.substring(failinimi.length() - 4).equalsIgnoreCase(".csv"))
-                failinimi = failinimi + ".csv";
+            if (isFailinimiVäliKorras())
+                if (failinimi.length() >= 5 && !failinimi.substring(failinimi.length() - 4).equalsIgnoreCase(".csv"))
+                    failinimi = failinimi + ".csv";
         });
 
 
     }
 
-    private boolean isVäljadKorras() {
+    private boolean isKaustVäliKorras() {
         if (valitudpath == null || valitudpath.isEmpty()) {
             teade2.setText("Sisesta kausta asukoht!");
             return false;
         }
         try {
-            Paths.get(valitudpath);
-        } catch (InvalidPathException | NullPointerException e) {
-            teade2.setText("Täpsusta kausta asukoht!");
+            if (!Files.exists(Paths.get(valitudpath).toAbsolutePath())){
+                teade2.setText("Kausta pole olemas!");
+                return false;
+            }
+        } catch (InvalidPathException e) {
+            teade2.setText("Kausta asukoht ei sobi!");
             return false;
         }
+        return true;
+    }
+
+    private boolean isFailinimiVäliKorras() {
         if (failinimi == null || failinimi.isEmpty()) {
-            teade2.setText("Täpsusta failinimi!");
+            teade2.setText("Sisesta failinimi!");
             return false;
         }
         try {
             Paths.get(valitudpath + "\\" + failinimi);
-        } catch (InvalidPathException | NullPointerException e) {
+        } catch (InvalidPathException e) {
             teade2.setText("Failinimi ei sobi!");
             return false;
         }
