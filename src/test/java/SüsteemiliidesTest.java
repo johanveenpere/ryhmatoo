@@ -1,5 +1,4 @@
 import Model.NimmelülidUuring;
-import Model.Uuring;
 import Repository.UuringRepository;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

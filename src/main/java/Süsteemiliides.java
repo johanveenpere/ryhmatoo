@@ -76,4 +76,8 @@ public class Süsteemiliides {
     public UuringRepository getDb() {
         return db;
     }
+
+    public EntityManagerFactory getEmf() {
+        return emf;
+    }
 }

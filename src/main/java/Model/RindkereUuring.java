@@ -3,12 +3,8 @@ package Model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
-import Service.Kriteerium;
 import com.pixelmed.dicom.AttributeTag;
-import com.pixelmed.dicom.TagFromName;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.*;
 
 @Entity

@@ -1,13 +1,9 @@
 package Model;
 
-import Service.Kriteerium;
 import com.pixelmed.dicom.AttributeTag;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.Map;
 
 @Entity
