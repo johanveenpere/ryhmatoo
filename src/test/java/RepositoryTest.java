@@ -5,11 +5,9 @@ import Service.Kriteerium;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RepositoryTest {
@@ -160,5 +158,43 @@ public class RepositoryTest {
         for (Uuring uuring : koikRindkereUuringudPeale2018) {
             System.out.println(uuring.toString());
         }
+    }
+
+    @Test
+    public void eiSaaLisadaKorduvaid() {
+        Uuring uuring1 = new RindkereUuring("AB12345678",50);
+        Uuring uuring2 = new RindkereUuring("AB12345678",60);
+        repo.addUuring(uuring1);
+        try {
+            repo.addUuring(uuring2);
+        }
+        catch (EntityExistsException e) {
+            System.out.println(e);
+        }
+        try {
+            repo.addUuring(uuring2);
+        }
+        catch (EntityExistsException e) {
+            System.out.println(e);
+        }
+    }
+
+    @Test
+    public void saaTäitmataUuringud() {
+        List<Uuring> täidetudUuringud = new ArrayList<>();
+        List<Uuring> täitmataUuringud = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            for (Uuring uuring : DummyData.randomUuringud()) {
+                repo.addUuring(uuring);
+                if (i % 2 == 0) {
+                    uuring.setTäidetud(true);
+                    täidetudUuringud.add(uuring);
+                }
+                else {
+                    täitmataUuringud.add(uuring);
+                }
+            }
+        }
+        Assertions.assertArrayEquals(täitmataUuringud.toArray(), repo.getAllTäitmataUuringud().toArray());
     }
 }
