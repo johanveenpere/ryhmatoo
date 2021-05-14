@@ -2,7 +2,6 @@ package Repository;
 
 import Model.Uuring;
 import Service.Kriteerium;
-import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -38,20 +37,13 @@ public class UuringRepository {
      * @param uuring Uuring objekt
      */
     public void addUuring(Uuring uuring) {
-        EntityTransaction transaction = em.getTransaction();
-        transaction.begin();
-        try {
-            em.persist(uuring);
-            transaction.commit();
-        } catch (RollbackException e) {
-            transaction.rollback();
-            Throwable cause = e.getCause().getCause().getCause();
-            if (cause instanceof JdbcSQLIntegrityConstraintViolationException)
-                throw new EntityExistsException();
-            throw e;
-        } catch (Exception e) {
-            transaction.rollback();
-            throw e;
+        if (this.em.find(Uuring.class,uuring.getViit()) == null) {
+            this.em.getTransaction().begin();
+            this.em.persist(uuring);
+            this.em.getTransaction().commit();
+        }
+        else {
+            throw new EntityExistsException();
         }
     }
 
@@ -101,6 +93,10 @@ public class UuringRepository {
         if (uuringud.size() == 0)
             throw new TühiUuringulistException();
         return uuringud;
+    }
+
+    public List<Uuring> getAllTäitmataUuringud() {
+        return this.em.createQuery("SELECT c FROM Uuring AS c WHERE c.täidetud = false", Uuring.class).getResultList();
     }
 
     /**
