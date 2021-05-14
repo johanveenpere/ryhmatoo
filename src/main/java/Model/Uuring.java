@@ -105,8 +105,7 @@ public abstract class Uuring implements Comparable<Uuring> {
         return new HashMap<>(Map.of(
                 "Sugu", TagFromName.PatientSex,
                 "Vanus", TagFromName.PatientAge,
-                "Seade", TagFromName.StationName,
-                "Kuupäev", TagFromName.AcquisitionDate
+                "Seade", TagFromName.StationName
         ));
     }
 
