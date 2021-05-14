@@ -152,7 +152,7 @@ public abstract class Uuring implements Comparable<Uuring> {
 
     @Override
     public int compareTo(Uuring o) {
-        return o.getLoomiseaeg().compareTo(loomiseaeg);
+        return Double.compare(this.kaal, o.kaal);
     }
 
 }
