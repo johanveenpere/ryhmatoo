@@ -23,11 +23,11 @@ public class Süsteemiliides {
     public Süsteemiliides(String andmebaasiNimi) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory(andmebaasiNimi);
         em = emf.createEntityManager();
-        db = new UuringRepository(emf);
+        db = new UuringRepository(em);
     }
 
     public Süsteemiliides(EntityManagerFactory emf, EntityManager em) {
-        db = new UuringRepository(emf);
+        db = new UuringRepository(em);
     }
 
     public Süsteemiliides(UuringRepository db) {
@@ -65,7 +65,7 @@ public class Süsteemiliides {
     }
 
     public void teeKokkuvõte(String failitee, Class<? extends Uuring> tüüp, Kriteerium kriteerium) {
-        List<Uuring> uuringud = db.getValimiKandidaadid(tüüp, kriteerium);
+        List<Uuring> uuringud = db.getByKriteerium(tüüp, kriteerium);
         try {
             KokkuvõtteKoostaja.teeCSV(uuringud, failitee);
         } catch (IOException e) {

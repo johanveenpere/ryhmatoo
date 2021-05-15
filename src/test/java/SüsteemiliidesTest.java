@@ -1,19 +1,17 @@
 import Model.NimmelülidUuring;
-import Model.Uuring;
 import Repository.UuringRepository;
 import Service.Kriteerium;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.time.LocalDate;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class SüsteemiliidesTest {
 
@@ -23,8 +21,8 @@ class SüsteemiliidesTest {
 
     @BeforeAll
     static void setUp(){
-        emf = Persistence.createEntityManagerFactory("default");
-        db = new UuringRepository(emf);
+        var em = Persistence.createEntityManagerFactory("default").createEntityManager();
+        db = new UuringRepository(em);
         liides = new Süsteemiliides(db);
     }
 
@@ -47,7 +45,7 @@ class SüsteemiliidesTest {
 
     @Test
     void teeKokkuvõte() {
-        OffsetDateTime test = OffsetDateTime.of(2020,1,1,1,1,1,1, ZoneOffset.UTC);
+        var test = LocalDate.of(2020,1,1);
         Kriteerium kriteerium = new Kriteerium(80,60,65,1,5, test);
         liides.teeKokkuvõte("testKokkuvõtted", NimmelülidUuring.class, kriteerium);
     }
