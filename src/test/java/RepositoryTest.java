@@ -6,7 +6,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class RepositoryTest {
     public static void setup() {
         emf = Persistence.createEntityManagerFactory("default");
         em = emf.createEntityManager();
-        repo = new UuringRepository(em);
+        repo = new UuringRepository(emf);
     }
 
     @AfterAll
@@ -43,7 +43,9 @@ public class RepositoryTest {
             repo.addUuring(uuring);
         }
         List<Uuring> inDB = em.createQuery("SELECT c FROM Uuring AS c", Uuring.class).getResultList();
-        Assertions.assertEquals(uuringud,inDB);
+        for (int i = 0; i < uuringud.size(); i++) {
+            Assertions.assertEquals(uuringud.get(i).getViit(),inDB.get(i).getViit());
+        }
     }
 
     @Test
@@ -142,12 +144,12 @@ public class RepositoryTest {
             for (Uuring uuring : DummyData.randomUuringud()) {
                 repo.addUuring(uuring);
                 if (i % 2 == 0) {
-                    uuring.setLoomisaeg(LocalDate.of(2018,10,10));
+                    uuring.setLoomiseaeg(LocalDateTime.of(2018,10,10,6,0));
                 }
             }
         }
-        List<Uuring> koikRindkereUuringudEnne2018 = repo.getByKriteerium(RindkereUuring.class, new Kriteerium(200,0,0,0,0,LocalDate.of(2017,5,12)));
-        List<Uuring> koikRindkereUuringudPeale2018 = repo.getByKriteerium(RindkereUuring.class, new Kriteerium(200,0,0,0,0,LocalDate.of(2019,5,12)));
+        List<Uuring> koikRindkereUuringudEnne2018 = repo.getByKriteerium(RindkereUuring.class, new Kriteerium(200,0,0,0,0,LocalDateTime.of(2017,5,12,6,0)));
+        List<Uuring> koikRindkereUuringudPeale2018 = repo.getByKriteerium(RindkereUuring.class, new Kriteerium(200,0,0,0,0,LocalDateTime.of(2019,5,12,6,0)));
         Assertions.assertEquals(10, koikRindkereUuringudEnne2018.size());
         Assertions.assertEquals(5, koikRindkereUuringudPeale2018.size());
         System.out.println("=".repeat(10) + " Enne 2018 " + "=".repeat(10));

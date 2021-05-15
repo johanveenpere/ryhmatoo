@@ -2,12 +2,12 @@ package Service;
 
 import Model.Uuring;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Kriteerium {
     private double maxKaal = 0;
     private double minKaal = 0;
-    private LocalDate alguskuupäev = null;
+    private LocalDateTime algusaeg = null;
 
     private final double keskKaal;
     private final double mootemaaramatus;
@@ -44,8 +44,8 @@ public class Kriteerium {
         return minValim;
     }
 
-    public LocalDate getAlguskuupäev() {
-        return alguskuupäev;
+    public LocalDateTime getAlgusaeg() {
+        return algusaeg;
     }
 
     public void setMaxKaal(double maxKaal) {
@@ -56,8 +56,8 @@ public class Kriteerium {
         this.minKaal = minKaal;
     }
 
-    public void setAlguskuupäev(LocalDate alguskuupäev) {
-        this.alguskuupäev = alguskuupäev;
+    public void setAlguskuupäev(LocalDateTime algusaeg) {
+        this.algusaeg = algusaeg;
     }
 
     public void setTäitmataUuringud(boolean täitmataUuringud) {
@@ -80,16 +80,16 @@ public class Kriteerium {
         this.minKaal = minKaal;
     }
 
-    public Kriteerium(double maxKaal, double minKaal, double keskKaal, double mootemaaramatus, int minValim, LocalDate alguskuupäev) {
+    public Kriteerium(double maxKaal, double minKaal, double keskKaal, double mootemaaramatus, int minValim, LocalDateTime algusaeg) {
         this(maxKaal,minKaal,keskKaal,mootemaaramatus,minValim);
-        this.alguskuupäev = alguskuupäev;
+        this.algusaeg = algusaeg;
     }
 
     public boolean uuringVastabKriteeriumile(Uuring uuring) {
         boolean vastabMinKaaluKriteeriumile = uuring.getKaal() >= this.minKaal;
         boolean vastabMaxKaaluKriteeriumile = uuring.getKaal() <= this.maxKaal || this.maxKaal == 0;
         boolean vastabTäidetudKriteeriumile = (this.täidetudUuringud && this.täitmataUuringud) || (this.täidetudUuringud && uuring.isTäidetud()) || (this.täitmataUuringud && !uuring.isTäidetud());
-        boolean vastabAlgusKuupäevaKriteeriumile = this.alguskuupäev == null || this.alguskuupäev.isBefore(uuring.getLoomisaeg());
+        boolean vastabAlgusKuupäevaKriteeriumile = this.algusaeg == null || this.algusaeg.isBefore(uuring.getLoomiseaeg());
         return vastabMinKaaluKriteeriumile && vastabMaxKaaluKriteeriumile && vastabTäidetudKriteeriumile && vastabAlgusKuupäevaKriteeriumile;
     }
 

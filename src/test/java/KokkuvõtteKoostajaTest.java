@@ -18,11 +18,12 @@ public class KokkuvõtteKoostajaTest {
 
         int random = ThreadLocalRandom.current().nextInt(10000,99999);
         String failinimi = "testKokkuvõtteFail_"+random+".csv";
-        KokkuvõtteKoostaja.teeCSV(testUuringList(),failinimi);
+        File fail = new File(failinimi);
+        KokkuvõtteKoostaja.teeCSV(testUuringList(),fail);
 
         File testfail = new File(failinimi);
         assertTrue(testfail.exists());
-        //testfail.delete();
+        testfail.delete();
     }
 
     private List<Uuring> testUuringList() throws NoSuchMethodException, DicomException, IOException, IllegalAccessException, InvocationTargetException {

@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Valim implements Comparable<Valim>{
+public class Valim implements Comparable<Valim> {
     private final Class<?> uuringType;
     private final Kriteerium kriteerium;
     private final List<Uuring> uuringud;
@@ -15,6 +15,9 @@ public class Valim implements Comparable<Valim>{
     private double keskKaal = 0;
     private double hälve = 0;
     private int suurus = 0;
+    private String staatus;
+    private String uuringunimetus;
+    private int ootel;
 
     public Valim(Kriteerium kriteerium, Class<?> uuringType, List<Uuring> uuringud) {
         this.kriteerium = kriteerium;
@@ -23,8 +26,8 @@ public class Valim implements Comparable<Valim>{
         if (uuringud != null && uuringud.size() != 0) {
             Collections.sort(this.uuringud);
 
-            this.keskKaal = Math.round(uuringud.stream().mapToDouble(Uuring::getKaal).sum() / uuringud.size()*100) / (double) 100;
-            this.hälve = Math.round(Math.abs(kriteerium.getKeskKaal() - this.keskKaal)*100) / (double) 100;
+            this.keskKaal = Math.round(uuringud.stream().mapToDouble(Uuring::getKaal).sum() / uuringud.size() * 100) / (double) 100;
+            this.hälve = Math.round(Math.abs(kriteerium.getKeskKaal() - this.keskKaal) * 100) / (double) 100;
             this.suurus = uuringud.size();
         }
     }
@@ -65,6 +68,29 @@ public class Valim implements Comparable<Valim>{
         return this.suurus >= this.kriteerium.getMinValim();
     }
 
+    public void setUuringunimetus(String uuringunimetus) {
+        this.uuringunimetus = uuringunimetus;
+    }
+
+    public String getUuringunimetus() {
+        return uuringunimetus;
+    }
+
+    public void setOotel(int ootel) {
+        this.ootel = ootel;
+    }
+
+    public int getOotel() {
+        return  ootel;
+    }
+
+    public void setStaatus(String staatus) {
+        this.staatus = staatus;
+    }
+
+    public String getStaatus() {
+        return this.staatus;
+    }
 
     @Override
     public String toString() {
@@ -79,8 +105,7 @@ public class Valim implements Comparable<Valim>{
         String uuringud;
         if (this.uuringud != null) {
             uuringud = this.uuringud.stream().map(Uuring::simpleString).collect(Collectors.joining(", \n"));
-        }
-        else {
+        } else {
             uuringud = "";
         }
         return header + uuringud;

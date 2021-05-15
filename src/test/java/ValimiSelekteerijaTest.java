@@ -24,7 +24,7 @@ public class ValimiSelekteerijaTest {
     public static void setup() {
         emf = Persistence.createEntityManagerFactory("default");
         em = emf.createEntityManager();
-        repo = new UuringRepository(em);
+        repo = new UuringRepository(emf);
     }
 
     @AfterAll
@@ -75,7 +75,6 @@ public class ValimiSelekteerijaTest {
 
     @Test
     public void töötabSuureValimiga() {
-        System.out.println(repo.getAllUuringud(Uuring.class).size());
         for (int i = 0; i < 2000; i++) {
             for (Uuring uuring : DummyData.randomUuringud()) {
                 repo.addUuring(uuring);
@@ -95,7 +94,6 @@ public class ValimiSelekteerijaTest {
 
     @RepeatedTest(5)
     public void töötabVäikeseValimiga() {
-        System.out.println(repo.getAllUuringud(Uuring.class).size());
         for (int i = 0; i < 20; i++) {
             for (Uuring uuring : DummyData.randomUuringud()) {
                 repo.addUuring(uuring);
@@ -114,7 +112,6 @@ public class ValimiSelekteerijaTest {
 
     @RepeatedTest(5)
     public void töötabMinimaalseKriteeriumiga() {
-        System.out.println(repo.getAllUuringud(Uuring.class).size());
         for (int i = 0; i < 20; i++) {
             for (Uuring uuring : DummyData.randomUuringud()) {
                 repo.addUuring(uuring);
