@@ -17,15 +17,17 @@ import java.util.List;
 public class Süsteemiliides {
 
     private EntityManagerFactory emf;
+    private EntityManager em;
     private UuringRepository db;
 
     public Süsteemiliides(String andmebaasiNimi) {
-        emf = Persistence.createEntityManagerFactory(andmebaasiNimi);
-        db = new UuringRepository(emf);
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory(andmebaasiNimi);
+        em = emf.createEntityManager();
+        db = new UuringRepository(em);
     }
 
     public Süsteemiliides(EntityManagerFactory emf, EntityManager em) {
-        db = new UuringRepository(emf);
+        db = new UuringRepository(em);
     }
 
     public Süsteemiliides(UuringRepository db) {

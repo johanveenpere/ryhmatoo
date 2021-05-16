@@ -23,6 +23,10 @@ public class UuringRepository {
         em = emf.createEntityManager();
     }
 
+    public UuringRepository(EntityManager em) {
+        this.em = em;
+    }
+
     /**
      * Tagasta Uuring tüüpi objekt pildiviida kaudu
      * @param viit uuringu pildiviit
