@@ -21,7 +21,7 @@ public class Süsteemiliides {
     private UuringRepository db;
 
     public Süsteemiliides(String andmebaasiNimi) {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory(andmebaasiNimi);
+        emf = Persistence.createEntityManagerFactory(andmebaasiNimi);
         em = emf.createEntityManager();
         db = new UuringRepository(em);
     }
