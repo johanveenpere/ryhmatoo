@@ -47,7 +47,8 @@ public class Süsteemiliides {
             File path = new File(ülemkaust);
             List<File> failid = Arrays.asList(path.listFiles());
             try {
-                KujutiseFailiLugeja.loeKujutiseFailist(uuring, failid);
+                KujutiseFailiLugeja kujutiseFailiLugeja = new KujutiseFailiLugeja(uuring,failid);
+                kujutiseFailiLugeja.loeKujutiseFailist();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             } catch (NoSuchMethodException e) {
