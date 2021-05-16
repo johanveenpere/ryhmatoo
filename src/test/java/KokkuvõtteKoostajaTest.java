@@ -53,8 +53,10 @@ public class KokkuvõtteKoostajaTest {
 
         PeaNatiivUuring peaNatiivUuring1 = new PeaNatiivUuring("FF5", 70.5);
         PeaNatiivUuring peaNatiivUuring2 = new PeaNatiivUuring("FF6", 55.5);
-        StructuredReportFailiLugeja.loeStructuredReportFailist(peaNatiivUuring1,ktFail);
-        StructuredReportFailiLugeja.loeStructuredReportFailist(peaNatiivUuring2,ktFail);
+        StructuredReportFailiLugeja structuredReportFailiLugeja1 = new StructuredReportFailiLugeja(peaNatiivUuring1,ktFail);
+        StructuredReportFailiLugeja structuredReportFailiLugeja2 = new StructuredReportFailiLugeja(peaNatiivUuring2,ktFail);
+        structuredReportFailiLugeja1.loeStructuredReportFailist();
+        structuredReportFailiLugeja2.loeStructuredReportFailist();
 
         List<Uuring> uuringud = Arrays.asList(peaNatiivUuring1,nimmelülidUuring1,nimmelülidUuring2,rindkereUuring1,peaNatiivUuring2,rindkereUuring2,nimmelülidUuring3);
 
