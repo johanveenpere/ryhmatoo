@@ -14,20 +14,25 @@ import java.util.*;
  * et uue Uuring alamklassi loomisel ei oleks vaja antud klassi muuta.
  */
 public class KujutiseFailiLugeja {
+    private Uuring uuring;
+    private List<File> failid;
+
+    public KujutiseFailiLugeja(Uuring uuring, List<File> failid) {
+        this.uuring = uuring;
+        this.failid = failid;
+    }
 
     /**
      * Loeb Uuring isendiväljadele väärtused failidest. Loeb vajadusel nii ühest kui mitmest failist.
      * Kasutab parameetriks antud Uuring isendi getAtribuudid() meetodit info saamiseks, mida on vaja failidest lugeda.
      *
-     * @param uuring - Uuring isend, kuhu hakatakse väärtuseid lugema.
-     * @param failid - List<File> failidega
      * @throws NoSuchMethodException     - uuring isendil puudub set-meetod mida väljade täitmisel kutsutakse
      * @throws InvocationTargetException - kutsutud meetodi visatud ja wrapitud erind
      * @throws IllegalAccessException    - kutsutud meetodile pole ligipääsuõigust
      * @throws IOException
      * @throws DicomException            - atribuutide nimekirja failist lugemise viga
      */
-    public static void loeKujutiseFailist(Uuring uuring, List<File> failid) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException, DicomException {
+    public void loeKujutiseFailist() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, IOException, DicomException {
         AttributeList põhiAttributeList = new AttributeList();
         põhiAttributeList.read(failid.get(0));
         Map<String, AttributeTag> põhiAtribuudid = new HashMap<>(uuring.getPõhiAtribuudid());

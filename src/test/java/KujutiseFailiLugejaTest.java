@@ -20,7 +20,8 @@ public class KujutiseFailiLugejaTest {
                 new File("src/test/resources/PATSIENT_TEST.CR.Nimmelülid_AP_L.1.1.2021.03.24.13.31.54.108.34909532.dcm")
                 );
 
-        KujutiseFailiLugeja.loeKujutiseFailist(nimmelülidUuring,failid);
+        KujutiseFailiLugeja kujutiseFailiLugeja = new KujutiseFailiLugeja(nimmelülidUuring,failid);
+        kujutiseFailiLugeja.loeKujutiseFailist();
 
         assertEquals("TUKRAX1",nimmelülidUuring.getSeade());
         assertEquals("M",nimmelülidUuring.getSugu());
@@ -36,7 +37,8 @@ public class KujutiseFailiLugejaTest {
                 new File("src/test/resources/PATSIENT_TEST.CR.Rindkere_PA_sei.1.1.2021.03.24.13.32.32.425.71130489.dcm")
         );
 
-        KujutiseFailiLugeja.loeKujutiseFailist(rindkereUuring,failid);
+        KujutiseFailiLugeja kujutiseFailiLugeja = new KujutiseFailiLugeja(rindkereUuring,failid);
+        kujutiseFailiLugeja.loeKujutiseFailist();
 
         assertEquals("TUKRAX1",rindkereUuring.getSeade());
         assertEquals("O",rindkereUuring.getSugu());

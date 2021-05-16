@@ -13,7 +13,8 @@ public class StructuredReportFailiLugejaTest {
     public void loebSRFailistÕigedVäärtused() throws IOException, DicomException {
         PeaNatiivUuring uuring = new PeaNatiivUuring("HTYKKT303033557T", 88.0);
         File fail = new File("src/test/resources/PATSIENT_TEST.SR.Spine_RINNALYLI.501.1.2021.03.18.15.36.13.135.23949794.dcm");
-        StructuredReportFailiLugeja.loeStructuredReportFailist(uuring,fail);
+        StructuredReportFailiLugeja structuredReportFailiLugeja = new StructuredReportFailiLugeja(uuring,fail);
+        structuredReportFailiLugeja.loeStructuredReportFailist();
 
         assertEquals("tukforce1",uuring.getSeade());
         assertEquals("O",uuring.getSugu());

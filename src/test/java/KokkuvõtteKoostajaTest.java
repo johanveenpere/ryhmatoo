@@ -42,19 +42,26 @@ public class KokkuvõtteKoostajaTest {
         NimmelülidUuring nimmelülidUuring1 = new NimmelülidUuring("AA11", 81.2);
         NimmelülidUuring nimmelülidUuring2 = new NimmelülidUuring("AA12", 81.7);
         NimmelülidUuring nimmelülidUuring3 = new NimmelülidUuring("AA13", 255.7);
-        KujutiseFailiLugeja.loeKujutiseFailist(nimmelülidUuring1,nimFailid);
-        KujutiseFailiLugeja.loeKujutiseFailist(nimmelülidUuring2,nimFailid);
-        KujutiseFailiLugeja.loeKujutiseFailist(nimmelülidUuring3,nimFailid);
+        KujutiseFailiLugeja kujutiseFailiLugeja1 = new KujutiseFailiLugeja(nimmelülidUuring1,nimFailid);
+        kujutiseFailiLugeja1.loeKujutiseFailist();
+        KujutiseFailiLugeja kujutiseFailiLugeja2 = new KujutiseFailiLugeja(nimmelülidUuring2,nimFailid);
+        kujutiseFailiLugeja2.loeKujutiseFailist();
+        KujutiseFailiLugeja kujutiseFailiLugeja3 = new KujutiseFailiLugeja(nimmelülidUuring3,nimFailid);
+        kujutiseFailiLugeja3.loeKujutiseFailist();
 
         RindkereUuring rindkereUuring1 = new RindkereUuring("BB223", 55.6);
         RindkereUuring rindkereUuring2 = new RindkereUuring("BB203", 66.6);
-        KujutiseFailiLugeja.loeKujutiseFailist(rindkereUuring1,rinFailid);
-        KujutiseFailiLugeja.loeKujutiseFailist(rindkereUuring2,rinFailid);
+        KujutiseFailiLugeja kujutiseFailiLugeja4 = new KujutiseFailiLugeja(rindkereUuring1,rinFailid);
+        kujutiseFailiLugeja4.loeKujutiseFailist();
+        KujutiseFailiLugeja kujutiseFailiLugeja5 = new KujutiseFailiLugeja(rindkereUuring2,rinFailid);
+        kujutiseFailiLugeja5.loeKujutiseFailist();
 
         PeaNatiivUuring peaNatiivUuring1 = new PeaNatiivUuring("FF5", 70.5);
         PeaNatiivUuring peaNatiivUuring2 = new PeaNatiivUuring("FF6", 55.5);
-        StructuredReportFailiLugeja.loeStructuredReportFailist(peaNatiivUuring1,ktFail);
-        StructuredReportFailiLugeja.loeStructuredReportFailist(peaNatiivUuring2,ktFail);
+        StructuredReportFailiLugeja structuredReportFailiLugeja1 = new StructuredReportFailiLugeja(peaNatiivUuring1,ktFail);
+        StructuredReportFailiLugeja structuredReportFailiLugeja2 = new StructuredReportFailiLugeja(peaNatiivUuring2,ktFail);
+        structuredReportFailiLugeja1.loeStructuredReportFailist();
+        structuredReportFailiLugeja2.loeStructuredReportFailist();
 
         List<Uuring> uuringud = Arrays.asList(peaNatiivUuring1,nimmelülidUuring1,nimmelülidUuring2,rindkereUuring1,peaNatiivUuring2,rindkereUuring2,nimmelülidUuring3);
 

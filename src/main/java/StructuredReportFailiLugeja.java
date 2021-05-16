@@ -19,18 +19,24 @@ import Model.*;
 
 
 public class StructuredReportFailiLugeja {
+    private Uuring uuring;
+    private File fail;
+
+    public StructuredReportFailiLugeja(Uuring uuring, File fail) {
+        this.uuring = uuring;
+        this.fail = fail;
+    }
+
     /**
      * Loeb Structured Report tüüpi failist andmed Uuring isendiväljadele.
      * Structured Report failis sisalduvad uuringu üldandmed ja üldiselt mitme AcquisitionEvent kohta.
      * Õige AcquisitionEvent leitakse Uuring isendi meetodist getAcquisitionKey päritava võtme abil,
      * mida võrreldakse välja "AcquisitionProtocol" väärtusega.
      *
-     * @param uuring - Uuring isend mille välju hakatkse meetodiga täitma.
-     * @param fail   - Structured Report tüüpi fail.
      * @throws IOException
      * @throws DicomException - failist ei saa teha AttributesList objekti.
      */
-    public static void loeStructuredReportFailist(Uuring uuring, File fail) throws IOException, DicomException {
+    public void loeStructuredReportFailist() throws IOException, DicomException {
         AttributeList attributeList = new AttributeList();
         attributeList.read(fail);
         JsonArray jsonArray = new JSONRepresentationOfStructuredReportObjectFactory().getDocument(fail);
@@ -63,7 +69,7 @@ public class StructuredReportFailiLugeja {
      * @param key        - JsonArrayle eelnev võti.
      * @return
      */
-    private static List<JsonArray> loeJsonArrayList(JsonParser jsonParser, String key) {
+    private List<JsonArray> loeJsonArrayList(JsonParser jsonParser, String key) {
         List<JsonArray> result = new ArrayList<>();
         while (jsonParser.hasNext()) {
             Event e = jsonParser.next();
