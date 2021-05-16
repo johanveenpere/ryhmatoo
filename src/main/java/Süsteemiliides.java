@@ -64,13 +64,16 @@ public class Süsteemiliides {
         }
     }
 
-    public void teeKokkuvõte(String failitee, Class<? extends Uuring> tüüp, Kriteerium kriteerium) {
-        List<Uuring> uuringud = db.getByKriteerium(tüüp, kriteerium);
-        try {
-            KokkuvõtteKoostaja.teeCSV(uuringud, failitee);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void teeKokkuvõte(File fail, Class<? extends Uuring> tüüp) throws IOException {
+        List<Uuring> uuringud = db.getAllUuringud(tüüp);
+        KokkuvõtteKoostaja.teeCSV(uuringud, fail);
     }
 
+    public UuringRepository getDb() {
+        return db;
+    }
+
+    public EntityManagerFactory getEmf() {
+        return emf;
+    }
 }

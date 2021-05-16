@@ -2,10 +2,9 @@ package Model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import com.pixelmed.dicom.AttributeTag;
-import com.pixelmed.dicom.TagFromName;
 
-import java.time.LocalDate;
+import com.pixelmed.dicom.AttributeTag;
+
 import java.util.*;
 
 @Entity
@@ -44,6 +43,8 @@ public class RindkereUuring extends Uuring {
     public void setDistanceSourceToPatient(double distanceSourceToPatient) {
         this.distanceSourceToPatient = distanceSourceToPatient;
     }
+
+
 
     @Override
     public String toCSVStringVäljadeNimed() {

@@ -5,11 +5,9 @@ import Service.Kriteerium;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
-import java.time.LocalDate;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RepositoryTest {
@@ -21,7 +19,7 @@ public class RepositoryTest {
     public static void setup() {
         emf = Persistence.createEntityManagerFactory("default");
         em = emf.createEntityManager();
-        repo = new UuringRepository(em);
+        repo = new UuringRepository(emf);
     }
 
     @AfterAll
@@ -45,7 +43,9 @@ public class RepositoryTest {
             repo.addUuring(uuring);
         }
         List<Uuring> inDB = em.createQuery("SELECT c FROM Uuring AS c", Uuring.class).getResultList();
-        Assertions.assertEquals(uuringud,inDB);
+        for (int i = 0; i < uuringud.size(); i++) {
+            Assertions.assertEquals(uuringud.get(i).getViit(),inDB.get(i).getViit());
+        }
     }
 
     @Test
@@ -144,12 +144,12 @@ public class RepositoryTest {
             for (Uuring uuring : DummyData.randomUuringud()) {
                 repo.addUuring(uuring);
                 if (i % 2 == 0) {
-                    uuring.setLoomisaeg(LocalDate.of(2018,10,10));
+                    uuring.setLoomiseaeg(LocalDateTime.of(2018,10,10,6,0));
                 }
             }
         }
-        List<Uuring> koikRindkereUuringudEnne2018 = repo.getByKriteerium(RindkereUuring.class, new Kriteerium(200,0,0,0,0,LocalDate.of(2017,5,12)));
-        List<Uuring> koikRindkereUuringudPeale2018 = repo.getByKriteerium(RindkereUuring.class, new Kriteerium(200,0,0,0,0,LocalDate.of(2019,5,12)));
+        List<Uuring> koikRindkereUuringudEnne2018 = repo.getByKriteerium(RindkereUuring.class, new Kriteerium(200,0,0,0,0,LocalDateTime.of(2017,5,12,6,0)));
+        List<Uuring> koikRindkereUuringudPeale2018 = repo.getByKriteerium(RindkereUuring.class, new Kriteerium(200,0,0,0,0,LocalDateTime.of(2019,5,12,6,0)));
         Assertions.assertEquals(10, koikRindkereUuringudEnne2018.size());
         Assertions.assertEquals(5, koikRindkereUuringudPeale2018.size());
         System.out.println("=".repeat(10) + " Enne 2018 " + "=".repeat(10));
@@ -160,5 +160,43 @@ public class RepositoryTest {
         for (Uuring uuring : koikRindkereUuringudPeale2018) {
             System.out.println(uuring.toString());
         }
+    }
+
+    @Test
+    public void eiSaaLisadaKorduvaid() {
+        Uuring uuring1 = new RindkereUuring("AB12345678",50);
+        Uuring uuring2 = new RindkereUuring("AB12345678",60);
+        repo.addUuring(uuring1);
+        try {
+            repo.addUuring(uuring2);
+        }
+        catch (EntityExistsException e) {
+            System.out.println(e);
+        }
+        try {
+            repo.addUuring(uuring2);
+        }
+        catch (EntityExistsException e) {
+            System.out.println(e);
+        }
+    }
+
+    @Test
+    public void saaTäitmataUuringud() {
+        List<Uuring> täidetudUuringud = new ArrayList<>();
+        List<Uuring> täitmataUuringud = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            for (Uuring uuring : DummyData.randomUuringud()) {
+                repo.addUuring(uuring);
+                if (i % 2 == 0) {
+                    uuring.setTäidetud(true);
+                    täidetudUuringud.add(uuring);
+                }
+                else {
+                    täitmataUuringud.add(uuring);
+                }
+            }
+        }
+        Assertions.assertArrayEquals(täitmataUuringud.toArray(), repo.getAllTäitmataUuringud().toArray());
     }
 }

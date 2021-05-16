@@ -10,7 +10,7 @@ import javax.json.stream.JsonParser.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,6 @@ public class StructuredReportFailiLugeja {
         JsonArray jsonArray = new JSONRepresentationOfStructuredReportObjectFactory().getDocument(fail);
         JsonParser jsonParser = Json.createParser(new StringReader(jsonArray.get(0).toString()));
 
-        uuring.setLoomisaeg(LocalDate.parse(loeJsonString(jsonParser, "StudyDate"), DateTimeFormatter.BASIC_ISO_DATE));
         uuring.setSeade(loeJsonString(jsonParser, "StationName"));
         uuring.setSugu(loeJsonString(jsonParser, "PatientSex"));
         uuring.setVanus(Integer.parseInt(loeJsonString(jsonParser, "PatientAge").substring(0, 3)));

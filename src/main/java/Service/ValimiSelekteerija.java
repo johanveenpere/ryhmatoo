@@ -37,7 +37,7 @@ public class ValimiSelekteerija <T extends Uuring> {
     public Valim getValim() throws PuudulikValimException {
         EntityManager em = emf.createEntityManager();
         try {
-            UuringRepository repo = new UuringRepository(em);
+            UuringRepository repo = new UuringRepository(this.emf);
             Valim sorteerimataValim = new Valim(kriteerium, uuringType, repo.getByKriteerium(uuringType, kriteerium));
 
             if (!sorteerimataValim.isMiinimumTäidetud()) {
@@ -109,13 +109,13 @@ public class ValimiSelekteerija <T extends Uuring> {
                         }
                     }
                 }
-                valimTable[i][0] = new Valim(new Kriteerium(kriteerium.getMaxKaal(), kriteerium.getMinKaal(), i + kriteerium.getMinKaal(), kriteerium.getMootemaaramatus(), kriteerium.getMinValim(), kriteerium.getAlguskuupäev()),this.uuringType, Collections.singletonList(parimUuring));
+                valimTable[i][0] = new Valim(new Kriteerium(kriteerium.getMaxKaal(), kriteerium.getMinKaal(), i + kriteerium.getMinKaal(), kriteerium.getMootemaaramatus(), kriteerium.getMinValim(), kriteerium.getAlgusaeg()),this.uuringType, Collections.singletonList(parimUuring));
             }
             return findValim(valimTable,uuringud,++setsize);
         }
         else {
             for (int i = 0; i < valimTable.length; i++) {
-                Kriteerium iterKriteerium = new Kriteerium(kriteerium.getMaxKaal(), kriteerium.getMinKaal(), Math.round(i + kriteerium.getMinKaal()), kriteerium.getMootemaaramatus(), kriteerium.getMinValim(), kriteerium.getAlguskuupäev());
+                Kriteerium iterKriteerium = new Kriteerium(kriteerium.getMaxKaal(), kriteerium.getMinKaal(), Math.round(i + kriteerium.getMinKaal()), kriteerium.getMootemaaramatus(), kriteerium.getMinValim(), kriteerium.getAlgusaeg());
                 double sum = setsize*(kriteerium.getMinKaal() + i);
                 Valim bestValim = new Valim(iterKriteerium,this.uuringType,new ArrayList<>());
                 for (Uuring uuring : uuringud) {

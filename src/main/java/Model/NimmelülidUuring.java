@@ -2,10 +2,10 @@ package Model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+
 import com.pixelmed.dicom.AttributeTag;
 import com.pixelmed.dicom.TagFromName;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -1,10 +1,13 @@
 package Model;
 
+import Service.Konfiguratsioonid;
 import com.pixelmed.dicom.AttributeTag;
 import com.pixelmed.dicom.TagFromName;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,8 +25,8 @@ public abstract class Uuring implements Comparable<Uuring> {
     private int vanus;
     @Column
     private String seade;
-    @Column
-    private LocalDate loomisaeg ;
+    @Column(columnDefinition = "DATETIME(0)")
+    private LocalDateTime loomiseaeg;
     @Column
     private boolean täidetud = false;
 
@@ -37,9 +40,8 @@ public abstract class Uuring implements Comparable<Uuring> {
     protected Uuring(String viit, double kaal) {
         this.viit = viit;
         this.kaal = kaal;
-        this.loomisaeg = LocalDate.now();
+        this.loomiseaeg = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
-
 
     /**
      * Getterid on kõigile isendiväljadele.
@@ -82,24 +84,28 @@ public abstract class Uuring implements Comparable<Uuring> {
         this.seade = seade;
     }
 
-    public void setLoomisaeg(LocalDate loomisaeg) {
-        this.loomisaeg = loomisaeg;
+    public void setLoomiseaeg(LocalDateTime kuupäev) {
+        this.loomiseaeg = kuupäev;
     }
 
     public String getSeade() {
         return seade;
     }
 
-    public LocalDate getLoomisaeg() {
-        return loomisaeg;
+    public LocalDateTime getLoomiseaeg() {
+        return loomiseaeg;
+    }
+
+    public String getUuringunimetus() {
+        Konfiguratsioonid konfiguratsioonid = new Konfiguratsioonid();
+        return konfiguratsioonid.getKlassidnimedmap().get(this.getClass());
     }
 
     public Map<String, AttributeTag> getPõhiAtribuudid() {
         return new HashMap<>(Map.of(
                 "Sugu", TagFromName.PatientSex,
                 "Vanus", TagFromName.PatientAge,
-                "Seade", TagFromName.StationName,
-                "Kuupäev", TagFromName.AcquisitionDate
+                "Seade", TagFromName.StationName
         ));
     }
 
@@ -113,7 +119,7 @@ public abstract class Uuring implements Comparable<Uuring> {
                 ", kaal=" + kaal +
                 ", sugu='" + sugu + '\'' +
                 ", vanus=" + vanus +
-                ", kuupäev=" + loomisaeg +
+                ", loomiseaeg=" + loomiseaeg +
                 '}';
     }
 
@@ -122,7 +128,7 @@ public abstract class Uuring implements Comparable<Uuring> {
                 ", kaal=" + kaal +
                 ", sugu='" + sugu + '\'' +
                 ", vanus=" + vanus +
-                ", kuupäev=" + loomisaeg +
+                ", loomiseaeg=" + loomiseaeg +
                 ", täidetud=" + täidetud;
     }
 
@@ -136,7 +142,7 @@ public abstract class Uuring implements Comparable<Uuring> {
     }
 
     public String toCSVString() {
-        return this.loomisaeg + ", "
+        return this.loomiseaeg + ", "
                 + this.seade + ", "
                 + this.viit + ", "
                 + this.kaal + ", "

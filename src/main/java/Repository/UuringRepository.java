@@ -5,6 +5,9 @@ import Service.Kriteerium;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
+import javax.persistence.EntityExistsException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.lang.reflect.Type;
@@ -12,7 +15,13 @@ import java.sql.Date;
 import java.util.List;
 
 public class UuringRepository {
+    protected EntityManagerFactory emf;
     protected EntityManager em;
+
+    public UuringRepository(EntityManagerFactory emf) {
+        this.emf = emf;
+        em = emf.createEntityManager();
+    }
 
     public UuringRepository(EntityManager em) {
         this.em = em;
@@ -32,9 +41,14 @@ public class UuringRepository {
      * @param uuring Uuring objekt
      */
     public void addUuring(Uuring uuring) {
-        this.em.getTransaction().begin();
-        this.em.persist(uuring);
-        this.em.getTransaction().commit();
+        if (this.em.find(Uuring.class,uuring.getViit()) == null) {
+            this.em.getTransaction().begin();
+            this.em.persist(uuring);
+            this.em.getTransaction().commit();
+        }
+        else {
+            throw new EntityExistsException();
+        }
     }
 
     /**
@@ -72,7 +86,21 @@ public class UuringRepository {
      * @return List soovitud Uuringu objektidest
      */
     public <T extends Uuring> List<Uuring> getAllUuringud(Class<T> uuringType) {
-       return this.em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c", Uuring.class).getResultList();
+        List<Uuring> uuringud = this.em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c", Uuring.class).getResultList();
+        if (uuringud.size() == 0)
+            throw new TühiUuringulistException();
+        return uuringud;
+    }
+
+    public <T extends Uuring> List<Uuring> getViimasedUuringud(int uuringutearv) {
+        List<Uuring> uuringud = this.em.createQuery("SELECT u FROM Uuring u ORDER BY u.loomiseaeg DESC", Uuring.class).setMaxResults(uuringutearv).getResultList();
+        if (uuringud.size() == 0)
+            throw new TühiUuringulistException();
+        return uuringud;
+    }
+
+    public List<Uuring> getAllTäitmataUuringud() {
+        return this.em.createQuery("SELECT c FROM Uuring AS c WHERE c.täidetud = false", Uuring.class).getResultList();
     }
 
     /**
@@ -83,8 +111,10 @@ public class UuringRepository {
      * @return List soovitud Uuring objektidest mis vastavad min/max kaalu kriteeriumitele
      */
     public <T extends Uuring> List<Uuring> getByKriteerium(Class<T> uuringType, Kriteerium kriteerium) {
-        List<Uuring> uuringud = em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c WHERE  c.kaal >= :minkaal", Uuring.class).setParameter("minkaal",kriteerium.getMinKaal()).getResultList();
-        uuringud.removeIf(uuring -> !kriteerium.uuringVastabKriteeriumile(uuring));
+            List<Uuring> uuringud = em.createQuery("SELECT c FROM " + uuringType.getName() + " AS c WHERE  c.kaal >= :minkaal", Uuring.class).setParameter("minkaal",kriteerium.getMinKaal()).getResultList();
+            uuringud.removeIf(uuring -> !kriteerium.uuringVastabKriteeriumile(uuring));
+        if (uuringud.size() == 0)
+            throw new TühiUuringulistException();
         return uuringud;
     }
 }
